@@ -38,7 +38,7 @@
   ],
   "system": "twodsix",
   "flags": {},
-  "download": "https://github.com/robinsving/pf2e-item-revitalizer/releases/latest/download/module.zip",
+  "download": "https://github.com/drl2/space-trader-foundryvtt/releases/latest/download/module.zip",
   "manifest": "https://github.com/drl2/space-trader-foundryvtt/releases/latest/download/module.json",
   "url": "https://github.com/drl2/space-trader-foundryvtt"
 }
