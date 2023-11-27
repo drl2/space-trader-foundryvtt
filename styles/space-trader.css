@@ -1,0 +1,134 @@
+.space-trader-settings-grid {
+    display: grid;
+    grid-template-columns: 200px 200px 200px;
+    grid-gap: 60px;
+}
+
+
+.space-trader-cargo-button {
+    width: 150px;
+}
+
+.space-trader-subsection {
+    margin-top: 4px;
+}
+
+.space-trader-trades-column {
+    padding: 4px;
+}
+
+.space-trader-tabs {
+    justify-content: start !important;
+}
+
+.space-trader-tab {
+    border: 2px solid #29aae1;
+    padding: 8px;
+    height: 400px;
+}
+
+.space-trader-codes {
+    display: grid;
+    grid-template-columns: 70px 70px 70px;
+    font-size: 12px;
+}
+
+.space-trader-divider {
+    border-top: 2px solid #29aae1;
+}
+
+
+.uwp-group {
+    display: grid;
+    grid-template-columns: 50px auto 30px;
+}
+
+.space-trader-search-button {
+    background: transparent;
+    padding: 0;
+    color: white;
+    line-height: normal;
+    border: 0;
+    align-self: center;
+    width: 30px;
+}
+
+.space-trader-search-button>i {
+    margin-right: 0;
+}
+
+.space-trader-search-button,
+.todo-list-icon-button:focus {
+    box-shadow: none;
+    text-shadow: 0 0 5px red;
+}
+
+.settings-spacer {
+    height: 150px;
+}
+
+.space-trader-worlds-list {
+    border: 2px solid #29aae1;
+    padding: 8px;
+}
+
+.space-trader-worlds-list select {
+    width: 100%;
+    height: 160px;
+}
+
+.space-trader-get-button {
+    width: 150px;
+}
+
+.space-trader-number-input {
+    width: 60px !important;
+}
+
+.space-trader-passenger-page {
+    display: grid;
+    grid-template-columns: 1fr 160px;
+}
+
+
+.space-trader-passenger-list {
+    grid-column: 1 / span 3;
+    border: 2px solid #29aae1;
+    padding: 8px;
+    height: 295px;
+    overflow: scroll;
+}
+
+
+.space-trader-lower-text {
+    padding-top: 6px;
+}
+
+.space-trader-passenger-detail {
+    display: grid;
+    grid-template-columns: 50px 120px 140px 50px 50px 120px 140px 1px;
+}
+
+.space-trader-column-header {
+    font-weight: bold;
+    text-decoration: underline;
+    padding-bottom: 4px;
+}
+
+.space-trader-freight-page {
+    display: grid;
+    grid-template-columns: 1fr 160px;
+}
+
+.space-trader-freight-list {
+    grid-column: 1 / span 3;
+    border: 2px solid #29aae1;
+    padding: 8px;
+    height: 295px;
+    overflow: scroll;
+}
+
+.space-trader-freight-detail {
+    display: grid;
+    grid-template-columns: 30px 120px 70px 90px 50px 30px 120px 70px 90px 1px;
+}

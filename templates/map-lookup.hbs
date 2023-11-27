@@ -1,0 +1,15 @@
+<form autocomplete="off">
+    <div class="form-group">
+        <input class="query" type="text" value="{{query}}" name="query" data-dtype="String" />
+        <button class="search-button"><i class="fas fa-magnifying-glass"
+                title="{{localize 'SPACE-TRADER.LookUp'}}"></i> {{localize 'SPACE-TRADER.Search'}}</button>
+    </div>
+    <div class="space-trader-worlds-list">
+        <select name="chooseWorld" size="9" class="world-select">
+            {{selectOptions worlds selected=selectedWorld nameAttr="query" labelAttr="name"}}
+        </select>
+    </div>
+    <div>
+        <button class="select-button" disabled  title="{{localize 'SPACE-TRADER.Select'}}"> {{localize 'SPACE-TRADER.Select'}}</button>
+    </div>
+</form>

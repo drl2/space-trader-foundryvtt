@@ -1,0 +1,21 @@
+<span style="font-weight: bold">{{localize 'SPACE-TRADER.PassengersOnBoarded'}}:</span>
+<br />
+<table>
+    <tr>
+        <th>{{localize 'SPACE-TRADER.Type'}}</th>
+        <th>{{localize 'SPACE-TRADER.PriceCr'}}</th>
+    </tr>
+    
+    {{#each onboard}}
+    <tr>
+        <th>{{this.type}}</th>
+        <th>{{this.price}}</th>
+    </tr>
+    {{/each}}
+
+    <tr>
+        <th>{{localize 'SPACE-TRADER.Total'}}</th>
+        <th>{{localize 'SPACE-TRADER.Cr'}}{{total}}</th>
+    </tr>
+
+</table>

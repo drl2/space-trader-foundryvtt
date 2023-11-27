@@ -1,0 +1,97 @@
+                    <div class="space-trader-settings-grid">
+                        <div>
+                            <h3>{{localize "SPACE-TRADER.World"}}
+                                <button class="space-trader-search-button"><i class="fas fa-magnifying-glass"
+                                        title="{{localize 'SPACE-TRADER.LookUp'}}"></i></button>
+                            </h3>
+
+                            <div class="uwp-group">
+                                <label class="uwp-label">{{localize "SPACE-TRADER.UWP"}}:</label>
+                                <input type="text" value="{{config.uwp}}" name="config.uwp" data-dtype="String" />
+                            </div>
+                            <div class="space-trader-subsection">
+                                <label>{{localize "SPACE-TRADER.TradeCodes"}}:</label>
+                                <div class="space-trader-codes">
+                                    {{#each config.tradeCodes}}
+                                    <div class="form-group"
+                                        title="{{localize (concat 'SPACE-TRADER.TRADE-CODES.' @this.key 'Tooltip')}}">
+                                        <input type="checkbox" name="config.tradeCodes.{{@this.key}}" {{checked
+                                            this}} />
+                                        <label>{{@this.key}}</label>
+                                    </div>
+                                    {{/each}}
+                                </div>
+                            </div>
+                            <div class="space-trader-subsection">
+                                <div class="space-trader-codes">
+                                    <label>{{localize "SPACE-TRADER.TravelCode"}}</label>
+                                    <select name="config.travelCode">
+                                        {{#select config.travelCode}}
+                                        <option value="0">{{localize 'SPACE-TRADER.TRAVEL-CODES.None'}}</option>
+                                        <option value="1">{{localize 'SPACE-TRADER.TRAVEL-CODES.Amber'}}</option>
+                                        <option value="2">{{localize 'SPACE-TRADER.TRAVEL-CODES.Red'}}</option>
+                                        {{/select}}
+                                    </select>
+                                </div>
+                            </div>
+
+
+
+
+                            <div class="space-trader-subsection">
+                                <label>{{localize "SPACE-TRADER.Supplier"}}:</label>
+                                <div class="form-group" title="{{localize 'SPACE-TRADER.SupplierBroker'}}">
+                                    <label>{{localize "SPACE-TRADER.BrokerSkill"}}: </label>
+                                    <input type="text" value="{{config.supplierBrokerSkill}}"
+                                        name="config.supplierBrokerSkill" data-dtype="String" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3>{{localize "SPACE-TRADER.Travellers"}}</h3>
+                            <div class="form-group" title="{{localize 'SPACE-TRADER.TravBroker'}}">
+                                <label>{{localize "SPACE-TRADER.BrokerSkill"}}: </label>
+                                <input type="text" value="{{config.travBrokerSkill}}" name="config.travBrokerSkill"
+                                    data-dtype="String" />
+                            </div>
+                            <div class="form-group" title="{{localize 'SPACE-TRADER.StewardSkillTooltip'}}">
+                                <label>{{localize "SPACE-TRADER.StewardSkill"}}: </label>
+                                <input type="text" value="{{config.travStewardSkill}}" name="config.travStewardSkill"
+                                    data-dtype="String" />
+                            </div>
+                            <div class="form-group" title="{{localize 'SPACE-TRADER.NavalScoutRankTooltip'}}">
+                                <label>{{localize "SPACE-TRADER.NavalScoutRank"}}: </label>
+                                <input type="text" value="{{config.travRank}}" name="config.travRank"
+                                    data-dtype="String" />
+                            </div>
+                            <div class="form-group" title="{{localize 'SPACE-TRADER.HighestSocDMTooltip'}}">
+                                <label>{{localize "SPACE-TRADER.HighestSocDM"}}: </label>
+                                <input type="text" value="{{config.highestSocDM}}" name="config.highestSocDM"
+                                    data-dtype="String" />
+                            </div>
+                            <div class="form-group" title="{{localize 'SPACE-TRADER.IsArmedTooltip'}}">
+                                <input type="checkbox" name="config.isArmed" {{checked config.isArmed}} />
+                                <label>{{localize "SPACE-TRADER.IsArmed"}}</label>
+                            </div>
+
+                        </div>
+                        <div>
+                            <h3>{{localize "SPACE-TRADER.Destination"}}</h3>
+                            <div class="form-group" title="{{localize 'SPACE-TRADER.DistanceInParsecs'}}">
+                                <label>{{localize "SPACE-TRADER.Parsecs"}}: </label>
+                                <input type="text" value="{{config.parsecs}}" name="config.parsecs"
+                                    data-dtype="String" />
+                            </div>
+                            <div class="settings-spacer">&nbsp;</div>
+                            <h3>{{localize "SPACE-TRADER.Settings"}}</h3>
+                            <label>{{localize "SPACE-TRADER.MoneyChar"}}: </label>
+                            <select name="config.moneyTargetId">
+                                {{#select config.moneyTargetId}}
+                                {{#each pcs as |val|}}
+                                <option value="{{val.id}}">{{val.name}}</option>
+                                {{/each}}
+                                {{/select}}
+                            </select>
+                        </div>
+                    </div>

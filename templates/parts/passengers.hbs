@@ -1,0 +1,52 @@
+<div class="space-trader-passenger-page">
+    <div class="space-trader-lower-text" title="{{localize 'SPACE-TRADER.PassengerEffect'}}">
+        <label>{{localize "SPACE-TRADER.PassengerEffect"}}: </label>
+        <input class="space-trader-number-input" type="text" value="{{passengers.brokerRollEffect}}"
+            name="passengers.brokerRollEffect" data-dtype="String" />
+    </div>
+    <div>&nbsp;</div>
+    <div>
+        <button class="passenger-button space-trader-get-button" title="{{localize 'SPACE-TRADER.GetPassengers'}}">
+            {{localize
+            'SPACE-TRADER.GetPassengers'}}</button>
+    </div>
+
+    <div class="space-trader-passenger-list">
+        <div class="space-trader-passenger-detail">
+            <div>&nbsp;</div>
+            <div class="space-trader-column-header">{{localize 'SPACE-TRADER.Type'}}</div>
+            <div class="space-trader-column-header">{{localize 'SPACE-TRADER.PriceCr'}}</div>
+            <div>&nbsp;</div>
+            <div>&nbsp;</div>
+            <div class="space-trader-column-header">{{localize 'SPACE-TRADER.Type'}}</div>
+            <div class="space-trader-column-header">{{localize 'SPACE-TRADER.PriceCr'}}</div>
+            <div>&nbsp;</div>
+
+            {{#each passengerList}}
+            <div><input type="checkbox" name="passengerList.{{@this.key}}" {{checked this.checked}}
+                    data-id="{{@this.key}}" class="toggle-single-passenger" /></div>
+            <div>{{this.type}}</div>
+            <div>{{this.price}}</div>
+            <div>&nbsp;</div>
+            {{/each}}
+
+        </div>
+    </div>
+    <div class="space-trader-lower-text">
+        <input type="checkbox" name="toggleAll" class="toggle-all-passengers"
+            title="{{localize 'SPACE-TRADER.ToggleAll'}}" data-dtype="Boolean" {{checked passengers.allChecked}}
+            {{disabled passengers.none}} />
+        <label>{{localize 'SPACE-TRADER.ToggleAll'}}</label>
+    </div>
+    <div class="space-trader-lower-text">
+        {{localize 'SPACE-TRADER.BrokerSkill'}} {{config.travBrokerSkill}} =
+        {{maxHigh}} {{localize 'SPACE-TRADER.PASSENGERTYPES.High'}} ,
+        {{maxMid}} {{localize 'SPACE-TRADER.PASSENGERTYPES.Middle'}}
+    </div>
+    <div>
+        <button class="onboard-button space-trader-get-button" title="{{localize 'SPACE-TRADER.OnBoardTooltip'}}"
+            {{disabled passengers.noneSelected}}>
+            {{localize
+            'SPACE-TRADER.OnBoard'}}</button>
+    </div>
+</div>

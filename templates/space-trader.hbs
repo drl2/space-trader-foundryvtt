@@ -1,0 +1,37 @@
+{{log "space-trader-template" this}}
+<form class="flexrow" autocomplete="off">
+    <div class="space-trader-trades-column">
+        <div>
+            <nav class="sheet-tabs tabs space-trader-tabs" data-group="sections">
+                <a class="skill-tab" data-tab="settings"
+                    data-tooltip="{{localize 'SPACE-TRADER.SettingsTooltip'}}">{{localize "SPACE-TRADER.Settings"}}</a>
+                <a class="skill-tab" data-tab="passengers"
+                    data-tooltip="{{localize 'SPACE-TRADER.PassengersTooltip'}}">{{localize
+                    "SPACE-TRADER.Passengers"}}</a>
+                <a class="skill-tab" data-tab="freight"
+                    data-tooltip="{{localize 'SPACE-TRADER.FreightTooltip'}}">{{localize "SPACE-TRADER.Freight"}}</a>
+                <a class="skill-tab" data-tab="specbuy"
+                    data-tooltip="{{localize 'SPACE-TRADER.SpecBuyTooltip'}}">{{localize "SPACE-TRADER.SpecBuy"}}</a>
+                <a class="skill-tab" data-tab="specsell"
+                    data-tooltip="{{localize 'SPACE-TRADER.SpecSellTooltip'}}">{{localize "SPACE-TRADER.SpecSell"}}</a>
+            </nav>
+            <section id="trade-tabs" class="content">
+                <div class="space-trader-tab tab" data-group="sections" data-tab="settings">
+                    {{> settings}}
+                </div>
+                <div class="space-trader-tab tab" data-group="sections" data-tab="passengers">
+                    {{> passengers}}
+                </div>
+                <div class="space-trader-tab tab" data-group="sections" data-tab="freight">
+                    {{> freight}}
+                </div>
+                <div class="space-trader-tab tab" data-group="sections" data-tab="specbuy">
+                    {{> specbuy}}
+                </div>
+                <div class="space-trader-tab tab" data-group="sections" data-tab="specsell">
+                    {{> specsell}}
+                </div>
+            </section>
+        </div>
+    </div>
+</form>

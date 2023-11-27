@@ -1,0 +1,41 @@
+{
+  "id": "space-trader",
+  "title": "Space Trader",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "11",
+    "verified": "11"
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "twodsix",
+        "type": "system",
+        "compatibility": {}
+      }
+    ]
+  },
+  "authors": [
+    {
+      "name": "Don Lloyd",
+      "discord": "drl2",
+      "url": "https://gaming.drl2.com/",
+      "flags": {}
+    }
+  ],
+  "esmodules": [
+    "scripts/space-trader.js"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "styles": [
+    "styles/space-trader.css"
+  ],
+  "system": "twodsix",
+  "flags": {}
+}
