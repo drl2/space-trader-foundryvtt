@@ -204,3 +204,10 @@ export function getChecked(list) {
 export function removeChecked(list) {
     return list.filter(row => (!row.checked));
 }
+
+export function getFreight(actor) {
+    return actor.items.filter(item => (item.type == "component" 
+        && item.system.subtype === "cargo" 
+        && item.flags["space-trader"]?.isFreight));
+
+  }

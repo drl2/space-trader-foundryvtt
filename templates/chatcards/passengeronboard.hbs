@@ -1,4 +1,4 @@
-<span style="font-weight: bold">{{localize 'SPACE-TRADER.PassengersOnBoarded'}}:</span>
+<span style="font-weight: bold">{{localize 'SPACE-TRADER.PassengersOnBoarded'}}{{dest}}:</span>
 <br />
 <table>
     <tr>
@@ -8,8 +8,8 @@
     
     {{#each onboard}}
     <tr>
-        <th>{{this.type}}</th>
-        <th>{{this.price}}</th>
+        <td>{{this.type}}</td>
+        <td>{{this.price}}</td>
     </tr>
     {{/each}}
 
@@ -19,3 +19,4 @@
     </tr>
 
 </table>
+<br />
