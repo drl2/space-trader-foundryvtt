@@ -25,8 +25,8 @@
             {{#each passengerList}}
             <div><input type="checkbox" name="passengerList.{{@this.key}}" {{checked this.checked}}
                     data-id="{{@this.key}}" class="toggle-single-passenger" /></div>
-            <div>{{this.type}}</div>
-            <div>{{this.price}}</div>
+            <div class="space-trader-lower-text">{{this.type}}</div>
+            <div class="space-trader-lower-text">{{this.price}}</div>
             <div>&nbsp;</div>
             {{/each}}
 

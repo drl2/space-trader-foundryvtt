@@ -132,3 +132,24 @@
     display: grid;
     grid-template-columns: 30px 120px 70px 90px 50px 30px 120px 70px 90px 1px;
 }
+
+
+.space-trader-freight-sale-list {
+    border: 2px solid #29aae1;
+    padding: 8px;
+    height: 295px;
+    overflow: scroll;
+}
+
+.space-trader-freight-sale-detail {
+    display: grid;
+    grid-template-columns: 30px 200px 70px 90px;
+
+}
+
+
+.space-trader-freight-sale-bottom {
+    display: grid;
+    grid-template-columns: 50% 50%;
+
+}

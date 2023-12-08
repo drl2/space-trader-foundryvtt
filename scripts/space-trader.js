@@ -1,4 +1,4 @@
-import { TRADEGOODS, TRADECODES, ROLLTYPES, FREIGHTPRICES } from './trade-goods.js';
+import { TRADECODES, ROLLTYPES } from './trade-goods.js';
 import { TradeConfig } from './trade-config.js';
 import { MapLookup } from './map-lookup.js';
 import {
@@ -6,9 +6,10 @@ import {
   getDistanceDM, getPassengerDice, formatRollFormula, getDmHtml,
   getFreightPrices, hasChecked, getChecked, removeChecked, getPopDMFreight,
   getTravelCodeDMFreight, getTechLevelDMFreight, getFreightDice,
-  getFreightDMMail, getArmedDM, getTechLevelDMMail
+  getFreightDMMail, getArmedDM, getTechLevelDMMail, getFreight
 } from './utility.js';
 import * as Chat from './chat.js';
+import { FreightSale } from './freight-sale.js';
 
 Hooks.once('init', async function () {
   registerSettings(SpaceTrader.ID);
@@ -95,7 +96,8 @@ export class SpaceTrader extends FormApplication {
     FREIGHTLOAD: `modules/${this.ID}/templates/chatcards/freightload.hbs`,
   }
   static FLAGS = {
-    CONFIG: 'config'
+    CONFIG: 'config',
+    ISFREIGHT: 'isFreight'
   }
 
   constructor(actor, options) {
@@ -112,7 +114,8 @@ export class SpaceTrader extends FormApplication {
       brokerRollEffect: 0,
       noneSelected: true,
       none: true,
-      allChecked: false
+      allChecked: false,
+      noCargo: getFreight(actor).length == 0
     }
     this.freightList = [];
 
@@ -180,6 +183,7 @@ export class SpaceTrader extends FormApplication {
     html.on('change', ".toggle-all-freight", this._handleAllFreightToggle.bind(this));
     html.on('change', ".toggle-single-freight", this._handleFreightToggle.bind(this));
     html.on('click', ".load-button", this._handleLoadCargoClick.bind(this));
+    html.on('click', ".deliver-button", this._handleDeliverFreightClick.bind(this));
   }
 
   async _handleSearchClick(event) {
@@ -380,7 +384,8 @@ export class SpaceTrader extends FormApplication {
 
     const rollData = {
       onboard: checkedList,
-      total: total
+      total: total,
+      dest: (config.destinationName == "") ? "" : ` (${config.destinationName})`
     }
 
     let cardContent = await renderTemplate(SpaceTrader.TEMPLATES.PASSENGERONBOARD, rollData);
@@ -398,8 +403,6 @@ export class SpaceTrader extends FormApplication {
     ChatMessage.create(resultOptions);
 
     this.passengers.noneSelected = true;
-
-    await this.actor.update({ 'system.finance-notes': '' });
 
     await this.render(true);
 
@@ -421,7 +424,7 @@ export class SpaceTrader extends FormApplication {
 
       if (high > 0) {
         const highProto = {
-          name: game.i18n.localize('SPACE-TRADER.ITEMNAMES.HighPsgrStorage'),
+          name: game.i18n.localize('SPACE-TRADER.ITEMNAMES.HighPsgrStorage') + ((config.destinationName == "") ? "" : ` (${config.destinationName})`),
           type: "component"
         }
         const cargoSpace = new Item(highProto);
@@ -431,7 +434,7 @@ export class SpaceTrader extends FormApplication {
 
       if (middle > 0) {
         const highProto = {
-          name: game.i18n.localize('SPACE-TRADER.ITEMNAMES.MidPsgrStorage'),
+          name: game.i18n.localize('SPACE-TRADER.ITEMNAMES.MidPsgrStorage') + ((config.destinationName == "") ? "" : ` (${config.destinationName})`),
           type: "component"
         }
         const cargoSpace = new Item(highProto);
@@ -705,7 +708,8 @@ export class SpaceTrader extends FormApplication {
 
     const rollData = {
       onboard: checkedList,
-      total: total
+      total: total,
+      dest: (config.destinationName == "") ? "" : ` (${config.destinationName})`
     }
 
     let cardContent = await renderTemplate(SpaceTrader.TEMPLATES.FREIGHTLOAD, rollData);
@@ -730,7 +734,7 @@ export class SpaceTrader extends FormApplication {
       const row = checkedList[x];
 
       const proto = {
-        name: row.type,
+        name: row.type + ((config.destinationName == "") ? "" : ` (${config.destinationName})`),
         type: "component"
       }
 
@@ -738,16 +742,26 @@ export class SpaceTrader extends FormApplication {
       const newItem = await this.actor.createEmbeddedDocuments("Item", [cargoSpace.toObject()]);
 
       if (row.type == game.i18n.localize('SPACE-TRADER.FREIGHTTYPES.Mail')) {
-        await newItem[0].update({ "system.subtype": "cargo", "system.quantity": row.quantity, "system.weight": 5,
-          "system.price": row.price, "system.purchasePrice": row.price });
+        await newItem[0].update({
+          "system.subtype": "cargo", "system.quantity": row.quantity, "system.weight": 5,
+          "system.price": row.price, "system.purchasePrice": row.price
+        });
+        await newItem[0].setFlag(SpaceTrader.ID, SpaceTrader.FLAGS.ISFREIGHT, true)
       } else {
-        await newItem[0].update({ "system.subtype": "cargo", "system.quantity": 1, "system.weight": row.tons,
-          "system.price": row.price, "system.purchasePrice": row.price });
+        await newItem[0].update({
+          "system.subtype": "cargo", "system.quantity": 1, "system.weight": row.tons,
+          "system.price": row.price, "system.purchasePrice": row.price
+        });
+        await newItem[0].setFlag(SpaceTrader.ID, SpaceTrader.FLAGS.ISFREIGHT, true)
       }
     }
 
   }
 
+
+  async _handleDeliverFreightClick(event) {
+    new FreightSale(this).render(true);
+  }
 
 
   static getActors() {
@@ -795,5 +809,6 @@ export class SpaceTrader extends FormApplication {
 
     return isOk;
   }
+
 
 }

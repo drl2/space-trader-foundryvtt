@@ -1,0 +1,32 @@
+<form autocomplete="off">
+    <div class="space-trader-freight-sale-list">
+        <div class="space-trader-freight-sale-detail">
+            <div>&nbsp;</div>
+            <div class="space-trader-column-header">{{localize 'SPACE-TRADER.Type'}}</div>
+            <div class="space-trader-column-header">{{localize 'SPACE-TRADER.Tons'}}</div>
+            <div class="space-trader-column-header">{{localize 'SPACE-TRADER.ValueCr'}}</div>
+
+            {{#each freightList}}
+            <div><input type="checkbox" name="freightList.{{@this.key}}" {{checked this.checked}}
+                    data-id="{{@this.key}}" class="toggle-single-freight" /></div>
+            <div class="space-trader-lower-text">{{this.type}}</div>
+            <div class="space-trader-lower-text">{{this.tons}}</div>
+            <div class="space-trader-lower-text">{{this.price}}</div>
+            {{/each}}
+        </div>
+    </div>
+    <div class="space-trader-freight-sale-bottom">
+        <div class="space-trader-lower-text">
+            <input type="checkbox" name="toggleAll" class="toggle-all-freight"
+                title="{{localize 'SPACE-TRADER.ToggleAll'}}" data-dtype="Boolean" {{checked allChecked}} {{disabled
+                noFreight}} />
+            <label>{{localize 'SPACE-TRADER.ToggleAll'}}</label>
+        </div>
+
+        <div>
+            <button class="select-button deliver-button" {{disabled noneSelected}} title="{{localize 'SPACE-TRADER.OffloadFreightTooltip'}}"> {{localize
+                'SPACE-TRADER.DeliverSelected'}}</button>
+        </div>
+    </div>
+
+</form>

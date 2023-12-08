@@ -55,8 +55,8 @@ export class TradeConfig {
             isArmed: false,
             parsecs: 1,
             moneyTargetId: 0,
-            highestSocDM: 0
-        
+            highestSocDM: 0,
+            destinationName: ""
         }
         return newConfig;
     }

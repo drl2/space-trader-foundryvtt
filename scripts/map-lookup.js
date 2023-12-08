@@ -62,9 +62,6 @@ export class MapLookup extends FormApplication {
         this.selectedWorld = "";
         this.traderApp = traderApp;
         this.config = config;
-
-        console.warn(traderApp);
-        console.warn(config);
     }
 
     async getData() {
