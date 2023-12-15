@@ -144,12 +144,52 @@
 .space-trader-freight-sale-detail {
     display: grid;
     grid-template-columns: 30px 200px 70px 90px;
-
 }
 
 
 .space-trader-freight-sale-bottom {
     display: grid;
     grid-template-columns: 50% 50%;
+}
 
+.space-trader-specbuy-page {
+    display: grid;
+    grid-template-columns: 160px auto;
+}
+
+
+.space-trader-specsell-page {
+    display: grid;
+    grid-template-columns: 160px auto;
+}
+
+.space-trader-twelvept-text {
+    font-size: 12px;
+}
+
+.space-trader-spec-buttondiv {
+    display: grid;
+    grid-template-columns: 400px 180px;
+}
+
+
+.space-trader-specsell-list {
+    border: 2px solid #29aae1;
+    padding: 8px;
+    height: 342px;
+    width: 553px;
+    overflow: scroll;
+}
+
+.space-trader-specbuy-list {
+    border: 2px solid #29aae1;
+    padding: 8px;
+    height: 300px;
+    width: 553px;
+    overflow: scroll;
+}
+
+.space-trader-specbuy-detail {
+    display: grid;
+    grid-template-columns: 30px 210px 120px 120px 30px;
 }

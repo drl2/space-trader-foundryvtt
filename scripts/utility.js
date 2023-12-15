@@ -136,6 +136,16 @@ export function getStarportDM(starport) {
     return dm;
 }
 
+export function getStarportDMSpec(starport) {
+    let dm = 0;
+
+    if (starport == "A") { dm = 6; }
+    else if (starport == "B" ) { dm = 4; }
+    else if (starport == "C") { dm = 2; }
+
+    return dm;
+}
+
 
 export function getDistanceDM(parsecs) {
     return 1-parsecs;

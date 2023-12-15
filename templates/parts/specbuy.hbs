@@ -1,1 +1,74 @@
-Coming soon(ish)!
+<div class="space-trader-specbuy-page">
+    <div class="space-trader-twelvept-text">
+        <label style="font-weight: bold;">{{localize "SPACE-TRADER.SPECTRADEROLLS.FindSupplier"}}:</label><br />
+        <label>{{localize "SPACE-TRADER.SPECTRADEROLLS.FindSupplierRoll"}}</label><br />
+        <br />
+        <label style="font-weight: bold;">{{localize "SPACE-TRADER.SPECTRADEROLLS.FindBlackMarket"}}:</label><br />
+        <label>{{localize "SPACE-TRADER.SPECTRADEROLLS.FindBlackMarketRoll"}}</label><br />
+        <br />
+        <label style="font-weight: bold;">{{localize "SPACE-TRADER.SPECTRADEROLLS.FindOnlineSupplier"}}:</label><br />
+        <label>{{localize "SPACE-TRADER.SPECTRADEROLLS.FindOnlineSupplierRoll"}}</label><br />
+        <br />
+        <label style="font-weight: bold;">{{localize "SPACE-TRADER.PreviousTryPenalty"}}</label><br />
+        <br />
+        <label style="font-weight: bold;">{{starportDM}}</label>
+    </div>
+    <div>
+        <div class="space-trader-spec-buttondiv">
+            <div>
+                <input type="checkbox" name="includeIllegal" class="toggle-include-illegal"
+                    title="{{localize 'SPACE-TRADER.IncludeIllegal'}}" data-dtype="Boolean" />
+                <label>{{localize 'SPACE-TRADER.IncludeIllegal'}}</label>
+
+            </div>
+            <div>
+                <button class="specbuy-get-button space-trader-get-button"
+                    title="{{localize 'SPACE-TRADER.FindSpecCargo'}}">
+                    {{localize 'SPACE-TRADER.FindSpecCargo'}}</button>
+            </div>
+        </div>
+
+        <div class="space-trader-specbuy-list">
+            <div class="space-trader-specbuy-detail">
+                <div>&nbsp;</div>
+                <div class="space-trader-column-header">{{localize 'SPACE-TRADER.Type'}}</div>
+                <div class="space-trader-column-header">{{localize 'SPACE-TRADER.BasePriceCr'}}</div>
+                <div class="space-trader-column-header">{{localize 'SPACE-TRADER.CurrentPriceCr'}}</div>
+                <div class="space-trader-column-header">{{localize 'SPACE-TRADER.Legal'}}</div>
+ 
+ 
+            <div>1</div>
+            <div>2</div>
+            <div>3</div>
+            <div>4</div>
+            <div>
+                <i class="fas fa-check" title="{{localize 'SPACE-TRADER.Legal'}}"></i>
+                <i class="fas fa-ban" title="{{localize 'SPACE-TRADER.Illegal'}}"></i>
+            </div>
+ 
+ 
+            </div>
+
+ 
+
+        </div>
+
+
+        <div class="space-trader-spec-buttondiv">
+            <div>
+                <input type="checkbox" name="toggleAll" class="toggle-all-specbuy"
+                    title="{{localize 'SPACE-TRADER.ToggleAll'}}" data-dtype="Boolean" {{checked specBuy.allChecked}}
+                    {{disabled specBuy.none}} />
+                <label>{{localize 'SPACE-TRADER.ToggleAll'}}</label>
+            </div>
+            <div>
+                <button class="specbuy-purchase-button space-trader-get-button"
+                    title="{{localize 'SPACE-TRADER.PurchaseSelected'}}" {{disabled specBuy.noneSelected}}> {{localize
+                    'SPACE-TRADER.PurchaseSelected'}}</button>
+            </div>
+        </div>
+
+
+
+    </div>
+</div>

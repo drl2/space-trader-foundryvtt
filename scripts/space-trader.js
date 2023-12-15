@@ -6,7 +6,8 @@ import {
   getDistanceDM, getPassengerDice, formatRollFormula, getDmHtml,
   getFreightPrices, hasChecked, getChecked, removeChecked, getPopDMFreight,
   getTravelCodeDMFreight, getTechLevelDMFreight, getFreightDice,
-  getFreightDMMail, getArmedDM, getTechLevelDMMail, getFreight
+  getFreightDMMail, getArmedDM, getTechLevelDMMail, getFreight,
+  getStarportDMSpec
 } from './utility.js';
 import * as Chat from './chat.js';
 import { FreightSale } from './freight-sale.js';
@@ -150,6 +151,12 @@ export class SpaceTrader extends FormApplication {
 
     const config = this.actor.getFlag(SpaceTrader.ID, SpaceTrader.FLAGS.CONFIG);
 
+    let starportDMText = "";
+    const worldStats = TradeConfig.parseUWP(config.uwp);
+    const starportDM = getStarportDMSpec(worldStats?.starport);
+    if (starportDM > 0) { starportDMText = `+${starportDM} ${game.i18n.localize('SPACE-TRADER.DM')}:  ${game.i18n.localize('SPACE-TRADER.Starport')} ${worldStats?.starport}`}
+    
+
     return {
       tradeCodes: TRADECODES,
       config: config,
@@ -160,7 +167,8 @@ export class SpaceTrader extends FormApplication {
       maxMid: ((config.travStewardSkill > 0) ? (config.travStewardSkill * 100) :
         ((config.travStewardSkill == 0) ? 10 : 0)),
       freight: this.freight,
-      freightList: this.freightList
+      freightList: this.freightList,
+      starportDM: starportDMText
     }
   }
 

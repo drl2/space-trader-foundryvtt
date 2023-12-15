@@ -77,6 +77,17 @@
         "DestinationWorld": "Destination World",
         "FreightLoaded": "Freight Loaded",
         "SellingFreight": "Selling Freight",
+        "PreviousTryPenalty": "DM -1 per previous try this month",
+        "DM": "DM",
+        "Starport": "Starport",
+        "PurchaseSelected": "Purchase Selected",
+        "SellSelected": "Sell Selected",
+        "FindSpecCargo": "Find Spec Cargo",
+        "IncludeIllegal": "Include Illegal Goods",
+        "BasePriceCr": "Base Price (Cr)",
+        "CurrentPriceCr": "Current Price (Cr)",
+        "Legal": "Legal",
+        "Illegal": "Illegal",
         "TRADE-CODES": {
             "Ag": "Ag",
             "AgTooltip": "Agricultural",
@@ -198,7 +209,20 @@
         "ITEMNAMES": {
             "HighPsgrStorage": "High Passenger Storage",
             "MidPsgrStorage": "Middle Passenger Storage"
+        },
+        "SPECTRADEROLLS": {
+            "FindSupplier": "Find a supplier or broker",
+            "FindSupplierRoll": "8+ Broker check (1D days, EDU or SOC)",
+            "FindBlackMarket": "Find a black market supplier or broker of illegal goods",
+            "FindBlackMarketRoll": " 8+ Streetwise check (1D days, EDU or SOC)",
+            "FindOnlineSupplier": "Find an online supplier or broker",
+            "FindOnlineSupplierRoll": "8+ Admin check (1D hours, EDU)",
+            "FindBuyer": "Find a buyer or broker",
+            "FindBuyerRoll": "8+ Broker check (1D days, EDU or SOC)",
+            "FindBlackMarketBuyer": "Find a black market buyer or broker of illegal goods",
+            "FindBlackMarketBuyerRoll": "8+ Streetwise check (1D days, EDU or SOC)",
+            "FindOnlineBuyer": "Find an online buyer or broker",
+            "FindOnlineBuyerRoll": "8+ Admin check (1D hours, EDU)"
         }
-
     }
   }

@@ -136,7 +136,6 @@ export class MapLookup extends FormApplication {
         })
 
         
-        console.warn(world);
         this.traderApp.render(true);
         this.close();
     }
