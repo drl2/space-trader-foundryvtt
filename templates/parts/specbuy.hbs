@@ -15,11 +15,14 @@
     </div>
     <div>
         <div class="space-trader-spec-buttondiv">
-            <div>
-                <input type="checkbox" name="includeIllegal" class="toggle-include-illegal"
-                    title="{{localize 'SPACE-TRADER.IncludeIllegal'}}" data-dtype="Boolean" />
-                <label>{{localize 'SPACE-TRADER.IncludeIllegal'}}</label>
-
+            <div class="space-trader-lower-text">
+                <label class="space-trader-lower-text">{{localize "SPACE-TRADER.Legality"}}:</label>
+                <select name="specBuy.isLegal" value="specBuy.isLegal">
+                    {{#select specBuy.isLegal}}
+                    <option value="true">{{localize 'SPACE-TRADER.Legal'}}</option>
+                    <option value="false">{{localize 'SPACE-TRADER.Illegal'}}</option>
+                    {{/select}}
+                </select>
             </div>
             <div>
                 <button class="specbuy-get-button space-trader-get-button"
@@ -32,41 +35,32 @@
             <div class="space-trader-specbuy-detail">
                 <div>&nbsp;</div>
                 <div class="space-trader-column-header">{{localize 'SPACE-TRADER.Type'}}</div>
+                <div class="space-trader-column-header">{{localize 'SPACE-TRADER.Tons'}}</div>
                 <div class="space-trader-column-header">{{localize 'SPACE-TRADER.BasePriceCr'}}</div>
-                <div class="space-trader-column-header">{{localize 'SPACE-TRADER.CurrentPriceCr'}}</div>
+                <div class="space-trader-column-header">{{localize 'SPACE-TRADER.BuyPriceCr'}}</div>
                 <div class="space-trader-column-header">{{localize 'SPACE-TRADER.Legal'}}</div>
- 
- 
-            <div>1</div>
-            <div>2</div>
-            <div>3</div>
-            <div>4</div>
-            <div>
-                <i class="fas fa-check" title="{{localize 'SPACE-TRADER.Legal'}}"></i>
-                <i class="fas fa-ban" title="{{localize 'SPACE-TRADER.Illegal'}}"></i>
-            </div>
- 
- 
+
+
+                <div>
+                    <a class="item-control buy" data-rolltype="buy" title="{{localize 'SPACE-TRADER.Buy'}}">
+                        <i class="fas fa-dollar-sign"></i>
+                    </a>
+                </div>
+                <div>Buy button on each line</div>
+                <div>3</div>
+                <div>4</div>
+                <div>5</div>
+                <div>Yes</div>
+
+
             </div>
 
- 
+
 
         </div>
 
 
-        <div class="space-trader-spec-buttondiv">
-            <div>
-                <input type="checkbox" name="toggleAll" class="toggle-all-specbuy"
-                    title="{{localize 'SPACE-TRADER.ToggleAll'}}" data-dtype="Boolean" {{checked specBuy.allChecked}}
-                    {{disabled specBuy.none}} />
-                <label>{{localize 'SPACE-TRADER.ToggleAll'}}</label>
-            </div>
-            <div>
-                <button class="specbuy-purchase-button space-trader-get-button"
-                    title="{{localize 'SPACE-TRADER.PurchaseSelected'}}" {{disabled specBuy.noneSelected}}> {{localize
-                    'SPACE-TRADER.PurchaseSelected'}}</button>
-            </div>
-        </div>
+
 
 
 

@@ -7,7 +7,7 @@ import {
   getFreightPrices, hasChecked, getChecked, removeChecked, getPopDMFreight,
   getTravelCodeDMFreight, getTechLevelDMFreight, getFreightDice,
   getFreightDMMail, getArmedDM, getTechLevelDMMail, getFreight,
-  getStarportDMSpec
+  getStarportDMSpec, getSpecBuyPopDM
 } from './utility.js';
 import * as Chat from './chat.js';
 import { FreightSale } from './freight-sale.js';
@@ -95,6 +95,7 @@ export class SpaceTrader extends FormApplication {
     FREIGHTROLL: `modules/${this.ID}/templates/chatcards/freightroll.hbs`,
     FREIGHTRESULTS: `modules/${this.ID}/templates/chatcards/freightresults.hbs`,
     FREIGHTLOAD: `modules/${this.ID}/templates/chatcards/freightload.hbs`,
+    SPECBUYAVAIL: `modules/${this.ID}/templates/chatcards/specbuyresults.hbs`,
   }
   static FLAGS = {
     CONFIG: 'config',
@@ -119,6 +120,10 @@ export class SpaceTrader extends FormApplication {
       noCargo: getFreight(actor).length == 0
     }
     this.freightList = [];
+    this.specBuy = {
+      isLegal: true
+    }
+    this.specBuyList = [];
 
   }
 
@@ -154,8 +159,7 @@ export class SpaceTrader extends FormApplication {
     let starportDMText = "";
     const worldStats = TradeConfig.parseUWP(config.uwp);
     const starportDM = getStarportDMSpec(worldStats?.starport);
-    if (starportDM > 0) { starportDMText = `+${starportDM} ${game.i18n.localize('SPACE-TRADER.DM')}:  ${game.i18n.localize('SPACE-TRADER.Starport')} ${worldStats?.starport}`}
-    
+    if (starportDM > 0) { starportDMText = `+${starportDM} ${game.i18n.localize('SPACE-TRADER.DM')}:  ${game.i18n.localize('SPACE-TRADER.Starport')} ${worldStats?.starport}` }
 
     return {
       tradeCodes: TRADECODES,
@@ -168,7 +172,9 @@ export class SpaceTrader extends FormApplication {
         ((config.travStewardSkill == 0) ? 10 : 0)),
       freight: this.freight,
       freightList: this.freightList,
-      starportDM: starportDMText
+      starportDM: starportDMText,
+      specBuy: this.specBuy,
+      specBuyList: this.specBuyList
     }
   }
 
@@ -176,8 +182,10 @@ export class SpaceTrader extends FormApplication {
     const data = foundry.utils.expandObject(formData);
 
     await this.actor.setFlag(SpaceTrader.ID, SpaceTrader.FLAGS.CONFIG, data.config);
+
     this.freight.brokerRollEffect = data.freight.brokerRollEffect;
     this.passengers.brokerRollEffect = data.passengers.brokerRollEffect;
+    this.specBuy.isLegal = data.specBuy.isLegal;
   }
 
   activateListeners(html) {
@@ -192,6 +200,7 @@ export class SpaceTrader extends FormApplication {
     html.on('change', ".toggle-single-freight", this._handleFreightToggle.bind(this));
     html.on('click', ".load-button", this._handleLoadCargoClick.bind(this));
     html.on('click', ".deliver-button", this._handleDeliverFreightClick.bind(this));
+    html.on('click', ".specbuy-get-button", this._handleGetSpecBuyClick.bind(this));
   }
 
   async _handleSearchClick(event) {
@@ -771,6 +780,91 @@ export class SpaceTrader extends FormApplication {
     new FreightSale(this).render(true);
   }
 
+  async _handleGetSpecBuyClick(event) {
+    const config = this.actor.getFlag(SpaceTrader.ID, SpaceTrader.FLAGS.CONFIG);
+    const worldStats = TradeConfig.parseUWP(config.uwp);
+    if (this.checkRequirements(ROLLTYPES.specBuy, config, worldStats)) {
+      const showGM = game.settings.get(SpaceTrader.ID, 'showGM');
+      const showPlayers = game.settings.get(SpaceTrader.ID, 'showPlayers');
+      const show3dRolls = game.settings.get(SpaceTrader.ID, 'show3dDice');
+      let qdmHtml = "";
+      let pdmHtml = "";
+
+      if (this.specBuy.isLegal) { // legal goods
+
+        const popDM = getSpecBuyPopDM(worldStats.population);
+
+        const dmsQuantity = [
+          { name: game.i18n.localize('SPACE-TRADER.DMNAMES.WorldPopulation'), value: popDM }
+        ]
+
+        if (showGM === "showDetails" || showPlayers === "showDetails") { 
+          qdmHtml = getDmHtml(dmsQuantity); 
+          qdmHtml = "<br />" + game.i18n.localize('SPACE-TRADER.DMNAMES.QuantityDMs') + ": " + qdmHtml;
+        }
+
+        await displayLegalCargoChatCard(popDM, game.i18n.localize('SPACE-TRADER.ROLLINGFOR.SpeculativeBuyAvail'), this.actor);
+
+
+      }
+      else { // illegal goods
+
+
+      }
+
+      async function displayLegalCargoChatCard(dmsTotal, rollType, actor) {
+        const roll = await new Roll(formatRollFormula("1d6", dmsTotal)).evaluate({ async: true });
+        const rollHtml = await roll.render();
+
+        let itemCount = roll.total;
+
+        let noneFound = "";
+
+        if (itemCount < 0) { 
+          noneFound = game.i18n.localize('SPACE-TRADER.ERRORS.NoSpecCargo') + "<br />";
+          ui.notifications.info(noneFound);
+        }
+
+        if (show3dRolls) { game.dice3d?.showForRoll(roll); }
+
+        if (showGM != "resultsOnly" && (showPlayers != "resultsOnly" || showPlayers != "showNothing")) {
+          const rollData = {
+            rollType: rollType,
+            qdmHtml: qdmHtml,
+            rollHtml: rollHtml,
+            noneFound: noneFound
+          }
+
+          let cardContent = await renderTemplate(SpaceTrader.TEMPLATES.SPECBUYAVAIL, rollData);
+
+          const chatOptions = {
+            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            content: cardContent,
+            speaker: ChatMessage.getSpeaker({ actor: actor })
+          }
+  
+          if (showPlayers === "showNothing" || showPlayers === "resultsOnly") {
+            chatOptions.whisper = ChatMessage.getWhisperRecipients("GM");
+          }
+  
+  
+          await ChatMessage.create(chatOptions);
+        }
+
+    
+
+      
+      }
+
+
+
+
+    }
+
+
+
+  }
+
 
   static getActors() {
     let actors = game.actors.contents.filter(e => (e.type === 'traveller' || e.type === 'robot'));
@@ -810,6 +904,14 @@ export class SpaceTrader extends FormApplication {
     if (rollType === ROLLTYPES.passenger || rollType === ROLLTYPES.freight) {
       if (!Number.isInteger(parseInt(config.parsecs))) {
         ui.notifications.error(game.i18n.localize('SPACE-TRADER.ERRORS.BadParsecs'));
+        isOk = false;
+      }
+    }
+
+    // validate traveller broker skill
+    if (rollType === ROLLTYPES.specBuy) {
+      if (!Number.isInteger(parseInt(config.travBrokerSkill))) {
+        ui.notifications.error(game.i18n.localize('SPACE-TRADER.ERRORS.BadBrokerSkill'));
         isOk = false;
       }
     }

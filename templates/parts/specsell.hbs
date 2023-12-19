@@ -15,22 +15,33 @@
     </div>
     <div>
 
-        <div class="space-trader-specsell-list">
-
-need editable column for law level DM on illegal goods
-        </div>
-
         <div class="space-trader-spec-buttondiv">
             <div>
-                <input type="checkbox" name="toggleAll" class="toggle-all-specsell"
-                    title="{{localize 'SPACE-TRADER.ToggleAll'}}" data-dtype="Boolean" {{checked specSell.allChecked}}
-                    {{disabled specSell.none}} />
-                <label>{{localize 'SPACE-TRADER.ToggleAll'}}</label>
+                <input type="checkbox" name="includeIllegal" class="toggle-include-illegal"
+                    title="{{localize 'SPACE-TRADER.IncludeIllegal'}}" data-dtype="Boolean" />
+                <label>{{localize 'SPACE-TRADER.IncludeIllegal'}}</label>
+
             </div>
             <div>
-                <button class="specsell-button space-trader-get-button" title="{{localize 'SPACE-TRADER.SellSelected'}}"
-                    {{disabled specSell.noneSelected}}>{{localize 'SPACE-TRADER.SellSelected'}}</button>
+                <button class="specbuy-get-button space-trader-get-button"
+                    title="{{localize 'SPACE-TRADER.GetSalePrices'}}">
+                    {{localize 'SPACE-TRADER.GetSalePrices'}}</button>
             </div>
         </div>
+
+        <div class="space-trader-specsell-list">
+            <div class="space-trader-specsell-detail">
+               <div>&nbsp;</div>
+                <div class="space-trader-column-header">{{localize 'SPACE-TRADER.Type'}}</div>
+                <div class="space-trader-column-header">{{localize 'SPACE-TRADER.Tons'}}</div>
+                <div class="space-trader-column-header">{{localize 'SPACE-TRADER.BoughtPriceCr'}}</div>
+                <div class="space-trader-column-header">{{localize 'SPACE-TRADER.OfferCr'}}</div>
+                <div class="space-trader-column-header">{{localize 'SPACE-TRADER.Legal'}}</div>
+ </div>
+
+ need sell on each line w/popup for # of tons, law level diff if illegal
+
+        </div>
+
     </div>
 </div>

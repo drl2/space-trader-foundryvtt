@@ -81,7 +81,7 @@ export function getTravelCodeDMPassenger(code) {
     let dm = 0;
 
     if (code == "1") { dm = 1; }
-    else if (code == "2" ) { dm = -4; }
+    else if (code == "2") { dm = -4; }
 
     return dm;
 }
@@ -100,7 +100,7 @@ export function getTravelCodeDMFreight(code) {
     let dm = 0;
 
     if (code == "1") { dm = -2; }
-    else if (code == "2" ) { dm = -6; }
+    else if (code == "2") { dm = -6; }
 
     return dm;
 }
@@ -108,7 +108,7 @@ export function getTravelCodeDMFreight(code) {
 export function getTechLevelDMFreight(tl) {
     let dm = 0;
 
-    if (tl <= 6) { dm = -1;}
+    if (tl <= 6) { dm = -1; }
     else if (tl >= 9) { dm = 2; }
 
     return dm;
@@ -117,7 +117,7 @@ export function getTechLevelDMFreight(tl) {
 export function getFreightDMMail(freightDm) {
     let dm = 0;
 
-    if (freightDm <= -10) { dm = -2;}
+    if (freightDm <= -10) { dm = -2; }
     else if (freightDm <= -5) { dm = -1; }
     else if (freightDm <= 4) { dm = 0; }
     else if (freightDm <= 9) { dm = 1; }
@@ -129,7 +129,7 @@ export function getStarportDM(starport) {
     let dm = 0;
 
     if (starport == "A") { dm = 2; }
-    else if (starport == "B" ) { dm = 1; }
+    else if (starport == "B") { dm = 1; }
     else if (starport == "E") { dm = -1; }
     else if (starport == "X") { dm = -3; }
 
@@ -140,7 +140,7 @@ export function getStarportDMSpec(starport) {
     let dm = 0;
 
     if (starport == "A") { dm = 6; }
-    else if (starport == "B" ) { dm = 4; }
+    else if (starport == "B") { dm = 4; }
     else if (starport == "C") { dm = 2; }
 
     return dm;
@@ -148,42 +148,42 @@ export function getStarportDMSpec(starport) {
 
 
 export function getDistanceDM(parsecs) {
-    return 1-parsecs;
+    return 1 - parsecs;
 }
 
 export function getArmedDM(isArmed) {
     let dm = 0;
-    if (isArmed) { dm = 2}
+    if (isArmed) { dm = 2 }
     return dm;
 }
 
 export function getTechLevelDMMail(tl) {
     let dm = 0;
 
-    if (tl <= 5) { dm = -4;}
+    if (tl <= 5) { dm = -4; }
 
     return dm;
 }
 
 
 export function getPassengerDice(roll) {
-    if (roll > 20) {roll=20};
-    if (roll < 1) {roll=1};
+    if (roll > 20) { roll = 20 };
+    if (roll < 1) { roll = 1 };
 
-    const val = PASSENGERROLLS.filter(row => (row.minRoll <= roll && row.maxRoll >= roll ));
+    const val = PASSENGERROLLS.filter(row => (row.minRoll <= roll && row.maxRoll >= roll));
     return val;
 }
 
 export function getFreightDice(roll) {
-    if (roll > 20) {roll=20};
-    if (roll < 1) {roll=1};
+    if (roll > 20) { roll = 20 };
+    if (roll < 1) { roll = 1 };
 
-    const val = FREIGHTROLLS.filter(row => (row.minRoll <= roll && row.maxRoll >= roll ));
+    const val = FREIGHTROLLS.filter(row => (row.minRoll <= roll && row.maxRoll >= roll));
     return val;
 }
 
 export function formatRollFormula(base, dms) {
-    if (dms == 0 ) { return `${base}`; }
+    if (dms == 0) { return `${base}`; }
     else if (dms > 0) { return `${base}+${dms}`; }
     else { return `${base}${dms}`; }
 }
@@ -191,7 +191,7 @@ export function formatRollFormula(base, dms) {
 export function getDmHtml(primary, secondary) {
     let html = "<table>"
     primary.forEach((dm) => html += `<tr><td>${dm.name}</td><td>${dm.value}</td></tr>`);
-    secondary?.forEach((dm) => html += `<tr><td>${dm.name}</td><td>${dm.value}</td></tr>`);   
+    secondary?.forEach((dm) => html += `<tr><td>${dm.name}</td><td>${dm.value}</td></tr>`);
     html += "</table>"
 
     return html;
@@ -216,8 +216,16 @@ export function removeChecked(list) {
 }
 
 export function getFreight(actor) {
-    return actor.items.filter(item => (item.type == "component" 
-        && item.system.subtype === "cargo" 
+    return actor.items.filter(item => (item.type == "component"
+        && item.system.subtype === "cargo"
         && item.flags["space-trader"]?.isFreight));
+}
 
-  }
+export function getSpecBuyPopDM(pop) {
+    let dm = 0;
+
+    if (pop <= 3) { dm = -3; }
+    if (pop >= 9) { dm = 3; }
+
+    return dm;
+}

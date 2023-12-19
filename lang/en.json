@@ -83,11 +83,18 @@
         "PurchaseSelected": "Purchase Selected",
         "SellSelected": "Sell Selected",
         "FindSpecCargo": "Find Spec Cargo",
-        "IncludeIllegal": "Include Illegal Goods",
-        "BasePriceCr": "Base Price (Cr)",
-        "CurrentPriceCr": "Current Price (Cr)",
+        "BasePriceCr": "Base (Cr)",
+        "BuyPriceCr": "Buy (Cr)",
+        "BoughtPriceCr": "Cost (Cr)",
+        "OfferCr": "Offer (Cr)",
+        "Legality": "Legality",
         "Legal": "Legal",
         "Illegal": "Illegal",
+        "LLDiff": "LL Diff",
+        "GetSalePrices": "Get Sale Prices",
+        "LLDiffTooltip": "World law level - banned law level",
+        "Sell": "Sell",
+        "Buy": "Buy",
         "TRADE-CODES": {
             "Ag": "Ag",
             "AgTooltip": "Agricultural",
@@ -140,7 +147,8 @@
             "InvalidUWP": "UWP is invalid.  See https://wiki.travellerrpg.com/Universal_World_Profile",
             "MapConnectFail": "Error connecting to TravellerMap",
             "MissingQuery": "Query text cannot be empty",
-            "BadStewardSkill": "Bad or missing steward skill",
+            "BadStewardSkill": "Bad or missing Steward skill",
+            "BadBrokerSkill": "Bad or missing Broker skill",
             "BadParsecs": "Bad or missing travel distance in parsecs"
         },
         "WARNINGS": {
@@ -184,7 +192,9 @@
             "FreightTravelDM": "Freight Travel DM",
             "IsArmed": "Is Ship Armed?",
             "HighestSOC": "Higest SOC DM",
-            "Rank": "Highest Naval or Scout Rank"
+            "Rank": "Highest Naval or Scout Rank",
+            "QuantityDMs": "Quantity DMs",
+            "PriceDMs": "Price DMs"
         },
         "ROLLINGFOR": {
             "HighPassengers": "Rolling for High Passengers",
@@ -194,7 +204,8 @@
             "IncidentalCargo": "Rolling for Incidental Cargo",
             "MinorCargo": "Rolling for Minor Cargo",
             "MajorCargo": "Rolling for Major Cargo",
-            "Mail": "Rolling for Mail"
+            "Mail": "Rolling for Mail",
+            "SpeculativeBuyAvail": "Speculative Cargo Available" 
         },
         "PASSENGERTYPES": {
             "HighPsgr": "High Passengers",
