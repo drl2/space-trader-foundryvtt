@@ -1,5 +1,6 @@
-export const TRADEGOODS = {
-    CommonElectronics: {
+export const TRADEGOODS = [
+    {
+        Name: "CommonElectronics",
         D66: 11,
         Availability: ["All"],
         Tons: "2d6*10",
@@ -15,7 +16,8 @@ export const TRADEGOODS = {
             Po: 1
         }
     },
-    CommonIndustrialGoods: {
+    {
+        Name: "CommonIndustrialGoods",
         D66: 12,
         Availability: ["All"],
         Tons: "2d6*10",
@@ -29,7 +31,8 @@ export const TRADEGOODS = {
             Ag: 2
         }
     },
-    CommonManufacturedGoods: {
+    {
+        Name: "CommonManufacturedGoods",
         D66: 13,
         Availability: ["All"],
         Tons: "2d6*20",
@@ -43,7 +46,8 @@ export const TRADEGOODS = {
             Hi: 2
         }
     },
-    CommonRawMaterials: {
+    {
+        Name: "CommonRawMaterials",
         D66: 14,
         Availability: ["All"],
         Tons: "2d6*20",
@@ -57,7 +61,8 @@ export const TRADEGOODS = {
             Ag: 2
         }
     },
-    CommonConsumables: {
+    {
+        Name: "CommonConsumables",
         D66: 15,
         Availability: ["All"],
         Tons: "2d6*20",
@@ -75,7 +80,8 @@ export const TRADEGOODS = {
             Hi: 1
         }
     },
-    CommonOre: {
+    {
+        Name: "CommonOre",
         D66: 16,
         Availability: ["All"],
         Tons: "2d6*20",
@@ -88,9 +94,10 @@ export const TRADEGOODS = {
             Ni: 1
         }
     },
-    AdvancedElectronics: {
+    {
+        Name: "AdvancedElectronics",
         D66: 21,
-        Availability: ["In","Ht"],
+        Availability: ["In", "Ht"],
         Tons: "1d6*5",
         BasePrice: "100000",
         PurchaseDMs: {
@@ -103,9 +110,10 @@ export const TRADEGOODS = {
             As: 3
         }
     },
-    AdvancedMachineParts: {
+    {
+        Name: "AdvancedMachineParts",
         D66: 22,
-        Availability: ["In","Ht"],
+        Availability: ["In", "Ht"],
         Tons: "1d6*5",
         BasePrice: "75000",
         PurchaseDMs: {
@@ -117,9 +125,10 @@ export const TRADEGOODS = {
             Ni: 1
         }
     },
-    AdvancedManufacturedGoods: {
+    {
+        Name: "AdvancedManufacturedGoods",
         D66: 23,
-        Availability: ["In","Ht"],
+        Availability: ["In", "Ht"],
         Tons: "1d6*5",
         BasePrice: "100000",
         PurchaseDMs: {
@@ -130,9 +139,10 @@ export const TRADEGOODS = {
             Ri: 2
         }
     },
-    AdvancedWeapons: {
+    {
+        Name: "AdvancedWeapons",
         D66: 24,
-        Availability: ["In","Ht"],
+        Availability: ["In", "Ht"],
         Tons: "1d6*5",
         BasePrice: "150000",
         PurchaseDMs: {
@@ -144,9 +154,10 @@ export const TRADEGOODS = {
             Red: 4
         }
     },
-    AdvancedVehicles: {
+    {
+        Name: "AdvancedVehicles",
         D66: 25,
-        Availability: ["In","Ht"],
+        Availability: ["In", "Ht"],
         Tons: "1d6*5",
         BasePrice: "180000",
         PurchaseDMs: {
@@ -157,9 +168,10 @@ export const TRADEGOODS = {
             Ri: 2
         }
     },
-    BioChemicals: {
+    {
+        Name: "BioChemicals",
         D66: 26,
-        Availability: ["Ag","Wa"],
+        Availability: ["Ag", "Wa"],
         Tons: "1d6*5",
         BasePrice: "50000",
         PurchaseDMs: {
@@ -170,9 +182,10 @@ export const TRADEGOODS = {
             In: 2
         }
     },
-    CrystalsAndGems: {
+    {
+        Name: "CrystalsAndGems",
         D66: 31,
-        Availability: ["As","De","Ic"],
+        Availability: ["As", "De", "Ic"],
         Tons: "1d6*5",
         BasePrice: "20000",
         PurchaseDMs: {
@@ -185,7 +198,8 @@ export const TRADEGOODS = {
             Ri: 2
         }
     },
-    Cybernetics: {
+    {
+        Name: "Cybernetics",
         D66: 32,
         Availability: ["Ht"],
         Tons: "1d6",
@@ -199,9 +213,10 @@ export const TRADEGOODS = {
             Ri: 2
         }
     },
-    LiveAnimals: {
+    {
+        Name: "LiveAnimals",
         D66: 33,
-        Availability: ["Ag","Ga"],
+        Availability: ["Ag", "Ga"],
         Tons: "1d6*10",
         BasePrice: "10000",
         PurchaseDMs: {
@@ -211,9 +226,10 @@ export const TRADEGOODS = {
             Lo: 3
         }
     },
-    LuxuryConsumables: {
+    {
+        Name: "LuxuryConsumables",
         D66: 34,
-        Availability: ["Ag","Ga","Wa"],
+        Availability: ["Ag", "Ga", "Wa"],
         Tons: "1d6*10",
         BasePrice: "20000",
         PurchaseDMs: {
@@ -225,7 +241,8 @@ export const TRADEGOODS = {
             Ri: 2
         }
     },
-    LuxuryGoods: {
+    {
+        Name: "LuxuryGoods",
         D66: 35,
         Availability: ["Hi"],
         Tons: "1d6",
@@ -237,9 +254,10 @@ export const TRADEGOODS = {
             Ri: 4
         }
     },
-    MedicalSupplies: {
+    {
+        Name: "MedicalSupplies",
         D66: 36,
-        Availability: ["Hi","Ht"],
+        Availability: ["Hi", "Ht"],
         Tons: "1d6*5",
         BasePrice: "50000",
         PurchaseDMs: {
@@ -251,9 +269,10 @@ export const TRADEGOODS = {
             Ri: 1
         }
     },
-    Petrochemicals: {
+    {
+        Name: "Petrochemicals",
         D66: 41,
-        Availability: ["De","Fl","Ic","Wa"],
+        Availability: ["De", "Fl", "Ic", "Wa"],
         Tons: "1d6*10",
         BasePrice: "10000",
         PurchaseDMs: {
@@ -265,9 +284,10 @@ export const TRADEGOODS = {
             Lo: 2
         }
     },
-    Pharmaceuticals: {
+    {
+        Name: "Pharmaceuticals",
         D66: 42,
-        Availability: ["As","De","Hi","Wa"],
+        Availability: ["As", "De", "Hi", "Wa"],
         Tons: "1d6",
         BasePrice: "100000",
         PurchaseDMs: {
@@ -279,7 +299,8 @@ export const TRADEGOODS = {
             Lt: 1
         }
     },
-    Polymers: {
+    {
+        Name: "Polymers",
         D66: 43,
         Availability: ["In"],
         Tons: "1d6*10",
@@ -292,9 +313,10 @@ export const TRADEGOODS = {
             Ni: 1
         }
     },
-    PreciousMetals: {
+    {
+        Name: "PreciousMetals",
         D66: 44,
-        Availability: ["As","De","Ic","Fl"],
+        Availability: ["As", "De", "Ic", "Fl"],
         Tons: "1d6",
         BasePrice: "50000",
         PurchaseDMs: {
@@ -308,9 +330,10 @@ export const TRADEGOODS = {
             Ht: 1
         }
     },
-    RadioActives: {
+    {
+        Name: "RadioActives",
         D66: 45,
-        Availability: ["As","De","Lo"],
+        Availability: ["As", "De", "Lo"],
         Tons: "1d6",
         BasePrice: "1000000",
         PurchaseDMs: {
@@ -324,7 +347,8 @@ export const TRADEGOODS = {
             Ag: -3
         }
     },
-    Robots: {
+    {
+        Name: "Robots",
         D66: 46,
         Availability: ["In"],
         Tons: "1d6*5",
@@ -337,9 +361,10 @@ export const TRADEGOODS = {
             Ht: 1
         }
     },
-    Spices: {
+    {
+        Name: "Spices",
         D66: 51,
-        Availability: ["Ga","Wa","De"],
+        Availability: ["Ga", "Wa", "De"],
         Tons: "1d6*10",
         BasePrice: "6000",
         PurchaseDMs: {
@@ -351,9 +376,10 @@ export const TRADEGOODS = {
             Po: 3
         }
     },
-    Textiles: {
+    {
+        Name: "Textiles",
         D66: 52,
-        Availability: ["Ag","Ni"],
+        Availability: ["Ag", "Ni"],
         Tons: "1d6*20",
         BasePrice: "3000",
         PurchaseDMs: {
@@ -364,9 +390,10 @@ export const TRADEGOODS = {
             Na: 2
         }
     },
-    UncommonOre: {
+    {
+        Name: "UncommonOre",
         D66: 53,
-        Availability: ["As","Ic"],
+        Availability: ["As", "Ic"],
         Tons: "1d6*20",
         BasePrice: "5000",
         PurchaseDMs: {
@@ -377,9 +404,10 @@ export const TRADEGOODS = {
             Ni: 1
         }
     },
-    UncommonRawMaterials: {
+    {
+        Name: "UncommonRawMaterials",
         D66: 54,
-        Availability: ["Ag","De","Wa"],
+        Availability: ["Ag", "De", "Wa"],
         Tons: "1d6*10",
         BasePrice: "20000",
         PurchaseDMs: {
@@ -391,9 +419,10 @@ export const TRADEGOODS = {
             Ht: 1
         }
     },
-    Wood: {
+    {
+        Name: "Wood",
         D66: 55,
-        Availability: ["Ag","Ga"],
+        Availability: ["Ag", "Ga"],
         Tons: "1d6*20",
         BasePrice: "1000",
         PurchaseDMs: {
@@ -404,9 +433,10 @@ export const TRADEGOODS = {
             In: 1
         }
     },
-    Vehicles: {
+    {
+        Name: "Vehicles",
         D66: 56,
-        Availability: ["In","Ht"],
+        Availability: ["In", "Ht"],
         Tons: "1d6*10",
         BasePrice: "15000",
         PurchaseDMs: {
@@ -418,9 +448,10 @@ export const TRADEGOODS = {
             Ni: 2
         }
     },
-    IllegalBiochemicals: {
+    {
+        Name: "IllegalBiochemicals",
         D66: 61,
-        Availability: ["Ag","Wa"],
+        Availability: ["Ag", "Wa"],
         Tons: "1d6*5",
         BasePrice: "50000",
         PurchaseDMs: {
@@ -430,7 +461,8 @@ export const TRADEGOODS = {
             In: 6
         }
     },
-    IllegalCybernetics: {
+    {
+        Name: "IllegalCybernetics",
         D66: 62,
         Availability: ["Ht"],
         Tons: "1d6",
@@ -446,9 +478,10 @@ export const TRADEGOODS = {
             Red: 6
         }
     },
-    IllegalDrugs: {
+    {
+        Name: "IllegalDrugs",
         D66: 63,
-        Availability: ["As","De","Hi","Wa"],
+        Availability: ["As", "De", "Hi", "Wa"],
         Tons: "1d6",
         BasePrice: "100000",
         PurchaseDMs: {
@@ -462,9 +495,10 @@ export const TRADEGOODS = {
             Hi: 6
         }
     },
-    IllegalLuxuries: {
+    {
+        Name: "IllegalLuxuries",
         D66: 64,
-        Availability: ["Ag","Ga","Wa"],
+        Availability: ["Ag", "Ga", "Wa"],
         Tons: "1d6",
         BasePrice: "50000",
         PurchaseDMs: {
@@ -476,9 +510,10 @@ export const TRADEGOODS = {
             Hi: 4
         }
     },
-    IllegalWeapons: {
+    {
+        Name: "IllegalWeapons",
         D66: 65,
-        Availability: ["In","Ht"],
+        Availability: ["In", "Ht"],
         Tons: "1d6*5",
         BasePrice: "150000",
         PurchaseDMs: {
@@ -490,13 +525,14 @@ export const TRADEGOODS = {
             Red: 10
         }
     },
-    Exotics: {
+    {
+        Name: "Exotics",
         D66: 66,
         Availability: ["All"],
         Tons: "1",
         BasePrice: "1"
     }
-}
+]
 
 export const TRADECODES = [
     "Ag",
@@ -528,38 +564,38 @@ export const ROLLTYPES = {
 }
 
 export const PASSENGERROLLS = [
-    {minRoll: 1, maxRoll: 1, diceRoll: "0", diceDesc: "0"},
-    {minRoll: 2, maxRoll: 3, diceRoll: "1d6", diceDesc: "1D"},
-    {minRoll: 4, maxRoll: 6, diceRoll: "2d6", diceDesc: "2D"},
-    {minRoll: 7, maxRoll: 10, diceRoll: "3d6", diceDesc: "3D"},
-    {minRoll: 11, maxRoll: 13, diceRoll: "4d6", diceDesc: "4D"},
-    {minRoll: 14, maxRoll: 15, diceRoll: "5d6", diceDesc: "5D"},
-    {minRoll: 16, maxRoll: 16, diceRoll: "6d6", diceDesc: "6D"},
-    {minRoll: 17, maxRoll: 17, diceRoll: "7d6", diceDesc: "7D"},
-    {minRoll: 18, maxRoll: 18, diceRoll: "8d6", diceDesc: "8D"},
-    {minRoll: 19, maxRoll: 19, diceRoll: "9d6", diceDesc: "9D"},
-    {minRoll: 20, maxRoll: 20, diceRoll: "10d6", diceDesc: "10D"}
+    { minRoll: 1, maxRoll: 1, diceRoll: "0", diceDesc: "0" },
+    { minRoll: 2, maxRoll: 3, diceRoll: "1d6", diceDesc: "1D" },
+    { minRoll: 4, maxRoll: 6, diceRoll: "2d6", diceDesc: "2D" },
+    { minRoll: 7, maxRoll: 10, diceRoll: "3d6", diceDesc: "3D" },
+    { minRoll: 11, maxRoll: 13, diceRoll: "4d6", diceDesc: "4D" },
+    { minRoll: 14, maxRoll: 15, diceRoll: "5d6", diceDesc: "5D" },
+    { minRoll: 16, maxRoll: 16, diceRoll: "6d6", diceDesc: "6D" },
+    { minRoll: 17, maxRoll: 17, diceRoll: "7d6", diceDesc: "7D" },
+    { minRoll: 18, maxRoll: 18, diceRoll: "8d6", diceDesc: "8D" },
+    { minRoll: 19, maxRoll: 19, diceRoll: "9d6", diceDesc: "9D" },
+    { minRoll: 20, maxRoll: 20, diceRoll: "10d6", diceDesc: "10D" }
 ]
 
 export const FREIGHTROLLS = [
-    {minRoll: 1, maxRoll: 1, diceRoll: "0", diceDesc: "0"},
-    {minRoll: 2, maxRoll: 3, diceRoll: "1d6", diceDesc: "1D"},
-    {minRoll: 4, maxRoll: 5, diceRoll: "2d6", diceDesc: "2D"},
-    {minRoll: 6, maxRoll: 8, diceRoll: "3d6", diceDesc: "3D"},
-    {minRoll: 9, maxRoll: 11, diceRoll: "4d6", diceDesc: "4D"},
-    {minRoll: 12, maxRoll: 14, diceRoll: "5d6", diceDesc: "5D"},
-    {minRoll: 15, maxRoll: 16, diceRoll: "6d6", diceDesc: "6D"},
-    {minRoll: 17, maxRoll: 17, diceRoll: "7d6", diceDesc: "7D"},
-    {minRoll: 18, maxRoll: 18, diceRoll: "8d6", diceDesc: "8D"},
-    {minRoll: 19, maxRoll: 19, diceRoll: "9d6", diceDesc: "9D"},
-    {minRoll: 20, maxRoll: 20, diceRoll: "10d6", diceDesc: "10D"}
+    { minRoll: 1, maxRoll: 1, diceRoll: "0", diceDesc: "0" },
+    { minRoll: 2, maxRoll: 3, diceRoll: "1d6", diceDesc: "1D" },
+    { minRoll: 4, maxRoll: 5, diceRoll: "2d6", diceDesc: "2D" },
+    { minRoll: 6, maxRoll: 8, diceRoll: "3d6", diceDesc: "3D" },
+    { minRoll: 9, maxRoll: 11, diceRoll: "4d6", diceDesc: "4D" },
+    { minRoll: 12, maxRoll: 14, diceRoll: "5d6", diceDesc: "5D" },
+    { minRoll: 15, maxRoll: 16, diceRoll: "6d6", diceDesc: "6D" },
+    { minRoll: 17, maxRoll: 17, diceRoll: "7d6", diceDesc: "7D" },
+    { minRoll: 18, maxRoll: 18, diceRoll: "8d6", diceDesc: "8D" },
+    { minRoll: 19, maxRoll: 19, diceRoll: "9d6", diceDesc: "9D" },
+    { minRoll: 20, maxRoll: 20, diceRoll: "10d6", diceDesc: "10D" }
 ]
 
 export const FREIGHTPRICES = [
-    {parsecs: 1, high: 9000, middle: 6500, basic: 2000, low: 700, freight: 1000 },
-    {parsecs: 2, high: 14000, middle: 10000, basic: 3000, low: 1300, freight: 1600 },
-    {parsecs: 3, high: 21000, middle: 14000, basic: 5000, low: 2200, freight: 2600 },
-    {parsecs: 4, high: 34000, middle: 23000, basic: 8000, low: 3900, freight: 4400 },
-    {parsecs: 5, high: 60000, middle: 40000, basic: 14000, low: 7200, freight: 8500 },
-    {parsecs: 6, high: 210000, middle: 130000, basic: 55000, low: 27000, freight: 32000 }
+    { parsecs: 1, high: 9000, middle: 6500, basic: 2000, low: 700, freight: 1000 },
+    { parsecs: 2, high: 14000, middle: 10000, basic: 3000, low: 1300, freight: 1600 },
+    { parsecs: 3, high: 21000, middle: 14000, basic: 5000, low: 2200, freight: 2600 },
+    { parsecs: 4, high: 34000, middle: 23000, basic: 8000, low: 3900, freight: 4400 },
+    { parsecs: 5, high: 60000, middle: 40000, basic: 14000, low: 7200, freight: 8500 },
+    { parsecs: 6, high: 210000, middle: 130000, basic: 55000, low: 27000, freight: 32000 }
 ] 

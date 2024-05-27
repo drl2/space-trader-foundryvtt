@@ -7,9 +7,10 @@ import {
   getFreightPrices, hasChecked, getChecked, removeChecked, getPopDMFreight,
   getTravelCodeDMFreight, getTechLevelDMFreight, getFreightDice,
   getFreightDMMail, getArmedDM, getTechLevelDMMail, getFreight,
-  getStarportDMSpec, getSpecBuyPopDM
+  getStarportDMSpec, getSpecBuyPopDM, getCommonGoods, getTradeGoods,
+  getTradeGood, getWhisperTargets, isShipOwner
 } from './utility.js';
-import * as Chat from './chat.js';
+//import * as Chat from './chat.js';
 import { FreightSale } from './freight-sale.js';
 
 Hooks.once('init', async function () {
@@ -27,27 +28,29 @@ Hooks.once('devModeReady', ({ registerPackageDebugFlag }) => {
   registerPackageDebugFlag(SpaceTrader.ID);
 });
 
-Hooks.on("renderChatMessage", (app, html, data) => Chat.toggleChatDetails(app, html, data));
+//Hooks.on("renderChatMessage", (app, html, data) => Chat.toggleChatDetails(app, html, data)); 
 
 Hooks.on("renderTokenHUD", async (hud, html, token) => {
   const actor = game.actors.get(token.actorId);
-  if (!(game.user.isGM && actor.type == "ship")) return;
+  const shipOwnersCanUse = game.settings.get(SpaceTrader.ID, 'shipOwnersCanUse');
 
-  const button = $(`
-     <div class="control-icon">
-       <img src="icons/svg/coins.svg" width="36" height="36" title="${game.i18n.localize('SPACE-TRADER.TradingMenu')}"/>
-     </div>
-   `)
+  if (isShipOwner(actor, shipOwnersCanUse)) {
+    const button = $(`
+      <div class="control-icon">
+        <img src="icons/svg/coins.svg" width="36" height="36" title="${game.i18n.localize('SPACE-TRADER.TradingMenu')}"/>
+      </div>
+    `)
 
-  button.on('click', () => {
-    showTradeWindow(actor);
-  })
+    button.on('click', () => {
+      showTradeWindow(actor);
+    })
 
-  html.find('div.right').append(button);
-
+    html.find('div.right').append(button);
+  }
 })
 
 Hooks.on("getActorDirectoryEntryContext", async (html, menuItems) => {
+  const shipOwnersCanUse = game.settings.get(SpaceTrader.ID, 'shipOwnersCanUse');
   menuItems.push({
     name: "SPACE-TRADER.TradingMenu",
     icon: `<i class="fa fa-coins"></i>`,
@@ -59,23 +62,24 @@ Hooks.on("getActorDirectoryEntryContext", async (html, menuItems) => {
     condition: (html) => {
       const actorId = html[0].dataset.documentId;
       const actor = game.actors.get(actorId);
-      return game.user.isGM && (actor.type == "ship");
+      return isShipOwner(actor, shipOwnersCanUse);
     }
   })
 })
 
 Hooks.on("renderActorSheet", async (app, html) => {
+  const shipOwnersCanUse = game.settings.get(SpaceTrader.ID, 'shipOwnersCanUse');
   const actor = app.actor;
-  if (!(game.user.isGM && actor.type == "ship")) return;
+  if (isShipOwner(actor, shipOwnersCanUse)) {
+    const button = $(`<button class="space-trader-cargo-button"><i class="fa fa-coins"></i> ${game.i18n.localize('SPACE-TRADER.TradingMenu')}</button>`);
 
-  const button = $(`<button class="space-trader-cargo-button"><i class="fa fa-coins"></i> ${game.i18n.localize('SPACE-TRADER.TradingMenu')}</button>`);
+    button.on('click', () => {
+      showTradeWindow(actor);
+    })
 
-  button.on('click', () => {
-    showTradeWindow(actor);
-  })
-
-  const loc = html.find(".cargo-weight");
-  loc.append(button);
+    const loc = html.find(".cargo-weight");
+    loc.append(button);
+  }
 })
 
 
@@ -95,7 +99,8 @@ export class SpaceTrader extends FormApplication {
     FREIGHTROLL: `modules/${this.ID}/templates/chatcards/freightroll.hbs`,
     FREIGHTRESULTS: `modules/${this.ID}/templates/chatcards/freightresults.hbs`,
     FREIGHTLOAD: `modules/${this.ID}/templates/chatcards/freightload.hbs`,
-    SPECBUYAVAIL: `modules/${this.ID}/templates/chatcards/specbuyresults.hbs`,
+    SPECBUYROLL: `modules/${this.ID}/templates/chatcards/specbuyrollresults.hbs`,
+    SPECBUYDEFAULTS: `modules/${this.ID}/templates/chatcards/specbuydefaults.hbs`,
   }
   static FLAGS = {
     CONFIG: 'config',
@@ -214,6 +219,7 @@ export class SpaceTrader extends FormApplication {
     if (this.checkRequirements(ROLLTYPES.passenger, config, worldStats)) {
       const showGM = game.settings.get(SpaceTrader.ID, 'showGM');
       const showPlayers = game.settings.get(SpaceTrader.ID, 'showPlayers');
+      const shipOwnersCanUse = game.settings.get(SpaceTrader.ID, 'shipOwnersCanUse');
       const show3dRolls = game.settings.get(SpaceTrader.ID, 'show3dDice');
 
       let lowPsgrs = 0;
@@ -240,14 +246,14 @@ export class SpaceTrader extends FormApplication {
         { name: game.i18n.localize('SPACE-TRADER.DMNAMES.LowPassengers'), value: 1 },
       ];
       let dmsTotal = totalPrimary + 1;
-      if (showGM === "showDetails" || showPlayers === "showDetails") { dmHtml = getDmHtml(dmsPrimary, dmsSecondary); }
+      if (showGM === "showDetails") { dmHtml = getDmHtml(dmsPrimary, dmsSecondary); }
       lowPsgrs = await displayChatCard(dmsTotal, game.i18n.localize('SPACE-TRADER.ROLLINGFOR.LowPassengers'), this.actor);
 
 
       // basic passengers
       dmsSecondary = [];
       dmsTotal = totalPrimary;
-      if (showGM === "showDetails" || showPlayers === "showDetails") { dmHtml = getDmHtml(dmsPrimary); }
+      if (showGM === "showDetails") { dmHtml = getDmHtml(dmsPrimary); }
       basicPsgrs = await displayChatCard(dmsTotal, game.i18n.localize('SPACE-TRADER.ROLLINGFOR.BasicPassengers'), this.actor);
 
 
@@ -261,7 +267,7 @@ export class SpaceTrader extends FormApplication {
         { name: game.i18n.localize('SPACE-TRADER.DMNAMES.HighPassengers'), value: -4 },
       ];
       dmsTotal = totalPrimary - 4;
-      if (showGM === "showDetails" || showPlayers === "showDetails") { dmHtml = getDmHtml(dmsPrimary, dmsSecondary); }
+      if (showGM === "showDetails") { dmHtml = getDmHtml(dmsPrimary, dmsSecondary); }
       highPsgrs = await displayChatCard(dmsTotal, game.i18n.localize('SPACE-TRADER.ROLLINGFOR.BasicPassengers'), this.actor);
 
 
@@ -305,7 +311,7 @@ export class SpaceTrader extends FormApplication {
         speaker: ChatMessage.getSpeaker({ actor: this.actor })
       }
 
-      if (showPlayers === "showNothing") {
+      if (!showPlayers) {
         resultOptions.whisper = ChatMessage.getWhisperRecipients("GM");
       }
 
@@ -337,7 +343,7 @@ export class SpaceTrader extends FormApplication {
         }
 
 
-        if (showGM != "resultsOnly" && (showPlayers != "resultsOnly" || showPlayers != "showNothing")) {
+        if (showGM != "resultsOnly") {
 
           const rollData = {
             rollType: rollType,
@@ -356,7 +362,7 @@ export class SpaceTrader extends FormApplication {
             speaker: ChatMessage.getSpeaker({ actor: actor })
           }
 
-          if (showPlayers === "showNothing" || showPlayers === "resultsOnly") {
+          if (!showPlayers) {
             chatOptions.whisper = ChatMessage.getWhisperRecipients("GM");
           }
 
@@ -390,6 +396,7 @@ export class SpaceTrader extends FormApplication {
 
   async _handleOnBoardClick(event) {
     const showPlayers = game.settings.get(SpaceTrader.ID, 'showPlayers');
+    const shipOwnersCanUse = game.settings.get(SpaceTrader.ID, 'shipOwnersCanUse');
     const addPassengersToNotes = game.settings.get(SpaceTrader.ID, 'addPassengersToNotes');
     const allocatePassengerCargo = game.settings.get(SpaceTrader.ID, 'allocatePassengerCargo');
     const config = this.actor.getFlag(SpaceTrader.ID, SpaceTrader.FLAGS.CONFIG);
@@ -413,7 +420,7 @@ export class SpaceTrader extends FormApplication {
       speaker: ChatMessage.getSpeaker({ actor: this.actor })
     }
 
-    if (showPlayers === "showNothing") {
+    if (!showPlayers) {
       resultOptions.whisper = ChatMessage.getWhisperRecipients("GM");
     }
 
@@ -469,6 +476,7 @@ export class SpaceTrader extends FormApplication {
     if (this.checkRequirements(ROLLTYPES.freight, config, worldStats)) {
       const showGM = game.settings.get(SpaceTrader.ID, 'showGM');
       const showPlayers = game.settings.get(SpaceTrader.ID, 'showPlayers');
+      const shipOwnersCanUse = game.settings.get(SpaceTrader.ID, 'shipOwnersCanUse');
       const show3dRolls = game.settings.get(SpaceTrader.ID, 'show3dDice');
 
       let incidentalLots = 0;
@@ -495,14 +503,14 @@ export class SpaceTrader extends FormApplication {
         { name: game.i18n.localize('SPACE-TRADER.DMNAMES.MajorCargo'), value: -4 },
       ];
       let dmsTotal = totalPrimary - 4;
-      if (showGM === "showDetails" || showPlayers === "showDetails") { dmHtml = getDmHtml(dmsPrimary, dmsSecondary); }
+      if (showGM === "showDetails") { dmHtml = getDmHtml(dmsPrimary, dmsSecondary); }
       majorLots = await displayChatCard(dmsTotal, game.i18n.localize('SPACE-TRADER.ROLLINGFOR.MajorCargo'), this.actor);
 
 
       // Minor cargo
       dmsSecondary = [];
       dmsTotal = totalPrimary;
-      if (showGM === "showDetails" || showPlayers === "showDetails") { dmHtml = getDmHtml(dmsPrimary); }
+      if (showGM === "showDetails") { dmHtml = getDmHtml(dmsPrimary); }
       minorLots = await displayChatCard(dmsTotal, game.i18n.localize('SPACE-TRADER.ROLLINGFOR.MinorCargo'), this.actor);
 
 
@@ -511,7 +519,7 @@ export class SpaceTrader extends FormApplication {
         { name: game.i18n.localize('SPACE-TRADER.DMNAMES.IncidentalCargo'), value: 2 },
       ];
       dmsTotal = totalPrimary + 2;
-      if (showGM === "showDetails" || showPlayers === "showDetails") { dmHtml = getDmHtml(dmsPrimary, dmsSecondary); }
+      if (showGM === "showDetails") { dmHtml = getDmHtml(dmsPrimary, dmsSecondary); }
       incidentalLots = await displayChatCard(dmsTotal, game.i18n.localize('SPACE-TRADER.ROLLINGFOR.IncidentalCargo'), this.actor);
 
       //mail
@@ -524,7 +532,7 @@ export class SpaceTrader extends FormApplication {
         { name: game.i18n.localize('SPACE-TRADER.DMNAMES.Rank'), value: config.travRank }
       ]
       const mailDMsTotal = dmsMail.reduce((dm, object) => dm + parseInt(object.value), 0);
-      if (showGM === "showDetails" || showPlayers === "showDetails") { dmHtml = getDmHtml(dmsMail, dmsSecondary); }
+      if (showGM === "showDetails") { dmHtml = getDmHtml(dmsMail, dmsSecondary); }
       mailLots = await displayMailChatCard(mailDMsTotal, game.i18n.localize('SPACE-TRADER.ROLLINGFOR.Mail'), this.actor);
 
 
@@ -576,7 +584,7 @@ export class SpaceTrader extends FormApplication {
         speaker: ChatMessage.getSpeaker({ actor: this.actor })
       }
 
-      if (showPlayers === "showNothing") {
+      if (!showPlayers) {
         resultOptions.whisper = ChatMessage.getWhisperRecipients("GM");
       }
 
@@ -607,7 +615,7 @@ export class SpaceTrader extends FormApplication {
         }
 
 
-        if (showGM != "resultsOnly" && (showPlayers != "resultsOnly" || showPlayers != "showNothing")) {
+        if (showGM != "resultsOnly") {
 
           const rollData = {
             rollType: rollType,
@@ -626,7 +634,7 @@ export class SpaceTrader extends FormApplication {
             speaker: ChatMessage.getSpeaker({ actor: actor })
           }
 
-          if (showPlayers === "showNothing" || showPlayers === "resultsOnly") {
+          if (!showPlayers) {
             chatOptions.whisper = ChatMessage.getWhisperRecipients("GM");
           }
 
@@ -663,7 +671,7 @@ export class SpaceTrader extends FormApplication {
         }
 
 
-        if (showGM != "resultsOnly" && (showPlayers != "resultsOnly" || showPlayers != "showNothing")) {
+        if (showGM != "resultsOnly") {
 
           const rollData = {
             rollType: rollType,
@@ -682,7 +690,7 @@ export class SpaceTrader extends FormApplication {
             speaker: ChatMessage.getSpeaker({ actor: actor })
           }
 
-          if (showPlayers === "showNothing" || showPlayers === "resultsOnly") {
+          if (!showPlayers) {
             chatOptions.whisper = ChatMessage.getWhisperRecipients("GM");
           }
 
@@ -716,6 +724,7 @@ export class SpaceTrader extends FormApplication {
 
   async _handleLoadCargoClick(event) {
     const showPlayers = game.settings.get(SpaceTrader.ID, 'showPlayers');
+    const shipOwnersCanUse = game.settings.get(SpaceTrader.ID, 'shipOwnersCanUse');
     const config = this.actor.getFlag(SpaceTrader.ID, SpaceTrader.FLAGS.CONFIG);
     const checkedList = getChecked(this.freightList);
     this.freightList = removeChecked(this.freightList);
@@ -737,13 +746,14 @@ export class SpaceTrader extends FormApplication {
       speaker: ChatMessage.getSpeaker({ actor: this.actor })
     }
 
-    if (showPlayers === "showNothing") {
+    if (!showPlayers) {
       resultOptions.whisper = ChatMessage.getWhisperRecipients("GM");
     }
 
     ChatMessage.create(resultOptions);
 
     this.freight.noneSelected = true;
+    this.freight.noCargo = false;
 
     await this.render(true);
 
@@ -775,10 +785,12 @@ export class SpaceTrader extends FormApplication {
 
   }
 
-
   async _handleDeliverFreightClick(event) {
     new FreightSale(this).render(true);
   }
+
+
+
 
   async _handleGetSpecBuyClick(event) {
     const config = this.actor.getFlag(SpaceTrader.ID, SpaceTrader.FLAGS.CONFIG);
@@ -786,6 +798,7 @@ export class SpaceTrader extends FormApplication {
     if (this.checkRequirements(ROLLTYPES.specBuy, config, worldStats)) {
       const showGM = game.settings.get(SpaceTrader.ID, 'showGM');
       const showPlayers = game.settings.get(SpaceTrader.ID, 'showPlayers');
+      const shipOwnersCanUse = game.settings.get(SpaceTrader.ID, 'shipOwnersCanUse');
       const show3dRolls = game.settings.get(SpaceTrader.ID, 'show3dDice');
       let qdmHtml = "";
       let pdmHtml = "";
@@ -793,23 +806,98 @@ export class SpaceTrader extends FormApplication {
       if (this.specBuy.isLegal) { // legal goods
 
         const popDM = getSpecBuyPopDM(worldStats.population);
+        const randomGoods = [];  // rolled goods - per world pop
 
-        const dmsQuantity = [
-          { name: game.i18n.localize('SPACE-TRADER.DMNAMES.WorldPopulation'), value: popDM }
-        ]
+        // get common, trade goods
+        const commonGoods = getCommonGoods();
+        const tradeGoods = getTradeGoods(config.tradeCodes, true);
 
-        if (showGM === "showDetails" || showPlayers === "showDetails") { 
-          qdmHtml = getDmHtml(dmsQuantity); 
-          qdmHtml = "<br />" + game.i18n.localize('SPACE-TRADER.DMNAMES.QuantityDMs') + ": " + qdmHtml;
+        displayDefaultTradeGoods(commonGoods, showPlayers, game.i18n.localize('SPACE-TRADER.ROLLINGFOR.CommonTradeGoods'), this.actor);
+        displayDefaultTradeGoods(tradeGoods, showPlayers, game.i18n.localize('SPACE-TRADER.ROLLINGFOR.TradeCodeGoods'), this.actor);
+
+
+        for (let i = 0; i < worldStats.population; i++) {
+          const roll = await new Roll("d6rr6*10+d6").evaluate({ async: true });
+          const roilHtml = roll.render();
+          if (show3dRolls) { game.dice3d?.showForRoll(roll); }
+          const item = getTradeGood(roll.total)[0];
+          randomGoods.push(item);
+
+          if (showPlayers != "showNothing" || showGM != "resultsOnly") {
+            displayRolledTradeGoods(item, showPlayers, rollHtml, game.i18n.localize('SPACE-TRADER.ROLLINGFOR.RandomTradeGoods'));
+          }
         }
 
-        await displayLegalCargoChatCard(popDM, game.i18n.localize('SPACE-TRADER.ROLLINGFOR.SpeculativeBuyAvail'), this.actor);
+
+        displayDefaultTradeGoods(randomGoods, showPlayers, game.i18n.localize('SPACE-TRADER.ROLLINGFOR.RandomTradeGoods'), this.actor);
+
+        // TODO: roll for quantities and consolidate totals for duplicate items
+
+
+        // TODO: show cards for each grouping
+
+
+        // const dmsQuantity = 
+
+        //   { name: game.i18n.localize('SPACE-TRADER.DMNAMES.WorldPopulation'), value: popDM }
+        // ]
+
+        // if (showGM === "showDetails" || showPlayers === "showDetails") { 
+        //   qdmHtml = getDmHtml(dmsQuantity); 
+        //   qdmHtml = "<br />" + game.i18n.localize('SPACE-TRADER.DMNAMES.QuantityDMs') + ": " + qdmHtml;
+        // }
+
+        // await displayLegalCargoChatCard(popDM, game.i18n.localize('SPACE-TRADER.ROLLINGFOR.SpeculativeBuyAvail'), this.actor);
 
 
       }
       else { // illegal goods
 
 
+      }
+
+      async function displayDefaultTradeGoods(goods, showPlayers, rollType, actor) {
+        // results summary
+        const rollData = {
+          rollType: rollType,
+          available: goods
+        }
+
+        const cardContent = await renderTemplate(SpaceTrader.TEMPLATES.SPECBUYDEFAULTS, rollData);
+
+        const resultOptions = {
+          type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+          content: cardContent,
+          speaker: ChatMessage.getSpeaker({ actor: actor })
+        }
+
+        if (!showPlayers) {
+          resultOptions.whisper = ChatMessage.getWhisperRecipients("GM");
+        }
+
+        ChatMessage.create(resultOptions);
+      }
+
+      async function displayRolledTradeGoods(item, showPlayers, rollHtml, rollTYype) {
+        const rollData = {
+          rollType: rollType,
+          itemType: item,
+          rollHtml: rollHtml
+        }
+
+        const cardContent = await renderTemplate(SpaceTrader.TEMPLATES.SPECBUYROLL, rollData);
+
+        const resultOptions = {
+          type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+          content: cardContent,
+          speaker: ChatMessage.getSpeaker({ actor: actor })
+        }
+
+        if (!showPlayers) {
+          resultOptions.whisper = ChatMessage.getWhisperRecipients("GM");
+        }
+
+        ChatMessage.create(resultOptions);
       }
 
       async function displayLegalCargoChatCard(dmsTotal, rollType, actor) {
@@ -820,14 +908,14 @@ export class SpaceTrader extends FormApplication {
 
         let noneFound = "";
 
-        if (itemCount < 0) { 
-          noneFound = game.i18n.localize('SPACE-TRADER.ERRORS.NoSpecCargo') + "<br />";
+        if (itemCount < 0) {
+          noneFound = game.i18n.localize('SPACE-TRADER.INFO.NoSpecCargo') + "<br />";
           ui.notifications.info(noneFound);
         }
 
         if (show3dRolls) { game.dice3d?.showForRoll(roll); }
 
-        if (showGM != "resultsOnly" && (showPlayers != "resultsOnly" || showPlayers != "showNothing")) {
+        if (showGM != "resultsOnly") {
           const rollData = {
             rollType: rollType,
             qdmHtml: qdmHtml,
@@ -842,27 +930,16 @@ export class SpaceTrader extends FormApplication {
             content: cardContent,
             speaker: ChatMessage.getSpeaker({ actor: actor })
           }
-  
-          if (showPlayers === "showNothing" || showPlayers === "resultsOnly") {
+
+          if (!showPlayers) {
             chatOptions.whisper = ChatMessage.getWhisperRecipients("GM");
           }
-  
-  
+
+
           await ChatMessage.create(chatOptions);
         }
-
-    
-
-      
       }
-
-
-
-
     }
-
-
-
   }
 
 

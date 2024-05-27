@@ -1,0 +1,7 @@
+<div class="st-chatcard">
+    <span style="font-weight: bold">{{rollType}}</span>
+    <br />
+    {{#each available as |item|}}
+        {{localize (concat 'SPACE-TRADER.TRADEGOODNAMES.' @item.Name)}}<br />
+    {{/each}}
+</div>

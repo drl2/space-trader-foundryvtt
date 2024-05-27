@@ -1,3 +1,5 @@
+// deprecated for now
+
 import { SpaceTrader } from './space-trader.js'
 
 // toggle visibility of chat card sections based on user type and settings

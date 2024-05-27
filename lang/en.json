@@ -95,6 +95,7 @@
         "LLDiffTooltip": "World law level - banned law level",
         "Sell": "Sell",
         "Buy": "Buy",
+        "MustOwnTarget": "Must own target",
         "TRADE-CODES": {
             "Ag": "Ag",
             "AgTooltip": "Agricultural",
@@ -155,14 +156,17 @@
             "NoWorldFound": "Unable to find any worlds matching that search",
             "NotAllFetched": "Could not fetch all results.  Please try a more specific search."
         },
+        "INFO": {
+            "NoSpecCargo": "No speculative cargo available"
+        },
         "SETTINGS": {
             "ShowGM": {
-                "Name": "Show GM",
-                "Hint": "Controls how much detail the GM sees when results are rolled."
+                "Name": "Show GM/Owners",
+                "Hint": "Controls how much detail the GM sees when results are rolled.  Also applies to ship owners if Allow Ship Owners to Use is on."
             },
             "ShowPlayers": {
-                "Name": "Show Players",
-                "Hint": "Controls how much detail players see when results are rolled."
+                "Name": "Share Results with Players",
+                "Hint": "Players can see the details the GM sees when trade items are generated."
             },
             "PassengersToNotes": {
                 "Name": "Add passengers to ship's finance notes?",
@@ -175,7 +179,12 @@
             "PassengerCargo": {
                 "Name": "Allocate Passenger Cargo",
                 "Hint": "Add cargo items to account for High and Middle passenger storage requirements."
+            },
+            "OwnersCanUse": {
+                "Name": "Allow Ship Owners to Use",
+                "Hint": "Players who are marked as owners of a ship can access the Space Trader functionality.  Allows the GM to designate others to handle the trade rolls."
             }
+
         },
         "DMNAMES": {
             "RollEffect": "Roll Effect",
@@ -205,7 +214,9 @@
             "MinorCargo": "Rolling for Minor Cargo",
             "MajorCargo": "Rolling for Major Cargo",
             "Mail": "Rolling for Mail",
-            "SpeculativeBuyAvail": "Speculative Cargo Available" 
+            "RandomTradeGoods": "Random Trade Goods",
+            "CommonTradeGoods": "Common Trade Goods",
+            "TradeCodeGoods": "Goods by Trade Code"
         },
         "PASSENGERTYPES": {
             "HighPsgr": "High Passengers",
@@ -234,6 +245,44 @@
             "FindBlackMarketBuyerRoll": "8+ Streetwise check (1D days, EDU or SOC)",
             "FindOnlineBuyer": "Find an online buyer or broker",
             "FindOnlineBuyerRoll": "8+ Admin check (1D hours, EDU)"
+        },
+        "TRADEGOODNAMES": {
+            "CommonElectronics":	"Common Electronics",
+            "CommonIndustrialGoods":	"Common Industrial Goods",
+            "CommonManufacturedGoods":	"Common Manufactured Goods",
+            "CommonRawMaterials":	"Common Raw Materials",
+            "CommonConsumables":	"Common Consumables",
+            "CommonOre":	"Common Ore",
+            "AdvancedElectronics":	"Advanced Electronics",
+            "AdvancedMachineParts":	"Advanced Machine Parts",
+            "AdvancedManufacturedGoods":	"Advanced Manufactured Goods",
+            "AdvancedWeapons":	"Advanced Weapons",
+            "AdvancedVehicles":	"Advanced Vehicles",
+            "BioChemicals":	"Bio Chemicals",
+            "CrystalsAndGems":	"Crystals And Gems",
+            "Cybernetics":	"Cybernetics",
+            "LiveAnimals":	"Live Animals",
+            "LuxuryConsumables":	"Luxury Consumables",
+            "LuxuryGoods":	"Luxury Goods",
+            "MedicalSupplies":	"Medical Supplies",
+            "Petrochemicals":	"Petrochemicals",
+            "Pharmaceuticals":	"Pharmaceuticals",
+            "Polymers":	"Polymers",
+            "PreciousMetals":	"Precious Metals",
+            "RadioActives":	"Radioactives",
+            "Robots":	"Robots",
+            "Spices":	"Spices",
+            "Textiles":	"Textiles",
+            "UncommonOre":	"Uncommon Ore",
+            "UncommonRawMaterials":	"Uncommon Raw Materials",
+            "Wood":	"Wood",
+            "Vehicles":	"Vehicles",
+            "IllegalBiochemicals":	"Illegal Biochemicals",
+            "IllegalCybernetics":	"Illegal Cybernetics",
+            "IllegalDrugs":	"Illegal Drugs",
+            "IllegalLuxuries":	"Illegal Luxuries",
+            "IllegalWeapons":	"Illegal Weapons",
+            "Exotics":	"Exotics"
         }
     }
   }

@@ -1,4 +1,4 @@
-import { FREIGHTPRICES, FREIGHTROLLS, PASSENGERROLLS } from './trade-goods.js';
+import { FREIGHTPRICES, FREIGHTROLLS, PASSENGERROLLS, TRADEGOODS } from './trade-goods.js';
 
 export function log(force, ...args) {
     const shouldLog = force || game.modules.get('_dev-mode')?.api?.getPackageDebugValue(this.ID);
@@ -27,16 +27,19 @@ export function registerSettings(id) {
     game.settings.register(id, 'showPlayers', {
         name: `SPACE-TRADER.SETTINGS.ShowPlayers.Name`,
         hint: `SPACE-TRADER.SETTINGS.ShowPlayers.Hint`,
-        default: `resultsOnly`,
-        type: String,
+        default: `true`,
+        type: Boolean,
         scope: "world",
-        config: true,
-        choices: {
-            "showNothing": `SPACE-TRADER.ShowNothing`,
-            "resultsOnly": `SPACE-TRADER.ResultsOnly`,
-            "showRolls": `SPACE-TRADER.ShowRolls`,
-            "showDetails": `SPACE-TRADER.ShowDetails`
-        }
+        config: true
+    })
+
+    game.settings.register(id, 'shipOwnersCanUse', {
+        name: `SPACE-TRADER.SETTINGS.OwnersCanUse.Name`,
+        hint: `SPACE-TRADER.SETTINGS.OwnersCanUse.Hint`,
+        default: `false`,
+        type: Boolean,
+        scope: "world",
+        config: true
     })
 
     game.settings.register(id, 'show3dDice', {
@@ -65,6 +68,19 @@ export function registerSettings(id) {
         scope: "world",
         config: true
     })
+}
+
+export function getWhisperTargets(actor, shipOwnersCanUse) {
+     
+}
+
+export function isShipOwner(actor, shipOwnersCanUse) {
+    return ((actor.type === "ship")
+    && (
+      game.user.isGM
+      || (shipOwnersCanUse && (actor.ownership[game.user.id] === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER))
+    )
+    )
 }
 
 export function getPopDMPassenger(population) {
@@ -229,3 +245,33 @@ export function getSpecBuyPopDM(pop) {
 
     return dm;
 }
+
+export function getCommonGoods() {
+    return TRADEGOODS.filter(item => 
+        (item.D66 <= 16)
+        )
+}
+
+export function getTradeGoods(codes, legal) {
+    const keys = Object.keys(codes);
+    const findCodes = keys.filter(key => (codes[key] === true) );
+
+
+    return TRADEGOODS.filter(item => {
+        if (legal && item.D66 >= 61) {return false;}
+        if (!legal && item.D66 <= 56) {return false;}
+        
+        let value = 0;
+        findCodes.forEach(function(code) {
+            value = value + item.Availability.indexOf(code) !== -1;
+        })
+        return (value > 0);
+    }
+    ); 
+}
+
+export function getTradeGood(roll) {
+    return TRADEGOODS.filter(item => (item.D66 == roll) );
+}
+
+
