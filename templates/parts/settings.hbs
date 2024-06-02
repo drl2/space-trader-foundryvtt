@@ -26,11 +26,7 @@
                                 <div class="space-trader-codes">
                                     <label>{{localize "SPACE-TRADER.TravelCode"}}</label>
                                     <select name="config.travelCode">
-                                        {{#select config.travelCode}}
-                                        <option value="0">{{localize 'SPACE-TRADER.TRAVEL-CODES.None'}}</option>
-                                        <option value="1">{{localize 'SPACE-TRADER.TRAVEL-CODES.Amber'}}</option>
-                                        <option value="2">{{localize 'SPACE-TRADER.TRAVEL-CODES.Red'}}</option>
-                                        {{/select}}
+                                        {{selectOptions TRAVEL_CODES selected=config.travelCode localize=true}}
                                     </select>
                                 </div>
                             </div>
@@ -91,13 +87,10 @@
                             <div class="settings-spacer">&nbsp;</div>
                             <h3>{{localize "SPACE-TRADER.Settings"}}</h3>
                             <label>{{localize "SPACE-TRADER.MoneyChar"}}: </label>
-                            <select name="config.moneyTargetId">
-                                {{#select config.moneyTargetId}}
-                                {{#each pcs as |val|}}
-                                <option value="{{val.id}}">{{val.name}}</option>
-                                {{/each}}
-                                {{/select}}
+                            <select name="config.moneyTargetId">                            
+                                {{selectOptions pcs selected=config.moneyTargetId valueAttr="id" labelAttr="name" localize=true}}
                             </select>
+
                             <br/>
                             <label>({{localize "SPACE-TRADER.MustOwnTarget"}})</label>
                         </div>

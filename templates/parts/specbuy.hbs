@@ -18,10 +18,7 @@
             <div class="space-trader-lower-text">
                 <label class="space-trader-lower-text">{{localize "SPACE-TRADER.Legality"}}:</label>
                 <select name="specBuy.isLegal" value="specBuy.isLegal">
-                    {{#select specBuy.isLegal}}
-                    <option value="true">{{localize 'SPACE-TRADER.Legal'}}</option>
-                    <option value="false">{{localize 'SPACE-TRADER.Illegal'}}</option>
-                    {{/select}}
+                    {{selectOptions LEGAL selected=specBuy.isLegal localize=true}}
                 </select>
             </div>
             <div>

@@ -8,6 +8,16 @@ export function log(force, ...args) {
     }
 }
 
+export const TRAVEL_CODES = {
+    1: 'SPACE-TRADER.TRAVEL-CODES.None',
+    2: 'SPACE-TRADER.TRAVEL-CODES.Amber',
+    3: 'SPACE-TRADER.TRAVEL-CODES.Red'
+}
+
+export const LEGAL = {
+    true: 'SPACE-TRADER.Legal',
+    false: 'SPACE-TRADER.Illegal'
+}
 
 export function registerSettings(id) {
     game.settings.register(id, 'showGM', {
@@ -71,7 +81,10 @@ export function registerSettings(id) {
 }
 
 export function getWhisperTargets(actor, shipOwnersCanUse) {
-     
+     if (shipOwnersCanUse) {
+        return Object.entries(actor.ownership).filter(([key, value]) => value === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER).map(x => x[0]);
+     }
+     else {return ChatMessage.getWhisperRecipients("GM");}
 }
 
 export function isShipOwner(actor, shipOwnersCanUse) {
@@ -273,5 +286,4 @@ export function getTradeGoods(codes, legal) {
 export function getTradeGood(roll) {
     return TRADEGOODS.filter(item => (item.D66 == roll) );
 }
-
 

@@ -1,4 +1,4 @@
-import { getFreight, hasChecked, getChecked } from './utility.js';
+import { getFreight, hasChecked, getChecked, getWhisperTargets } from './utility.js';
 
 
 export class FreightSale extends FormApplication {
@@ -100,6 +100,7 @@ export class FreightSale extends FormApplication {
 
       async _handleDeliverFreightClick(event) {
         const showPlayers = game.settings.get(FreightSale.ID, 'showPlayers');
+        const shipOwnersCanUse = game.settings.get(FreightSale.ID, 'shipOwnersCanUse');
         const config = this.actor.getFlag(FreightSale.ID, FreightSale.FLAGS.CONFIG);
         const checkedList = getChecked(this.freightList);
         const totalValue = checkedList.reduce((a,b) => a + (b.price || 0), 0);
@@ -114,13 +115,13 @@ export class FreightSale extends FormApplication {
         let cardContent = await renderTemplate(FreightSale.TEMPLATES.FREIGHTSALECARD, rollData);
 
         const resultOptions = {
-          type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+          type: CONST.CHAT_MESSAGE_STYLES.OTHER,
           content: cardContent,
           speaker: ChatMessage.getSpeaker({ actor: this.actor })
         }
 
-        if (showPlayers === "showNothing") {
-            resultOptions.whisper = ChatMessage.getWhisperRecipients("GM");
+        if (!showPlayers) {
+            resultOptions.whisper = getWhisperTargets(this.actor, shipOwnersCanUse);
         }
 
         ChatMessage.create(resultOptions);

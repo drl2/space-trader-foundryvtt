@@ -8,7 +8,8 @@ import {
   getTravelCodeDMFreight, getTechLevelDMFreight, getFreightDice,
   getFreightDMMail, getArmedDM, getTechLevelDMMail, getFreight,
   getStarportDMSpec, getSpecBuyPopDM, getCommonGoods, getTradeGoods,
-  getTradeGood, getWhisperTargets, isShipOwner
+  getTradeGood, getWhisperTargets, isShipOwner, TRAVEL_CODES,
+  LEGAL
 } from './utility.js';
 //import * as Chat from './chat.js';
 import { FreightSale } from './freight-sale.js';
@@ -179,7 +180,9 @@ export class SpaceTrader extends FormApplication {
       freightList: this.freightList,
       starportDM: starportDMText,
       specBuy: this.specBuy,
-      specBuyList: this.specBuyList
+      specBuyList: this.specBuyList,
+      TRAVEL_CODES: TRAVEL_CODES,
+      LEGAL: LEGAL
     }
   }
 
@@ -268,7 +271,7 @@ export class SpaceTrader extends FormApplication {
       ];
       dmsTotal = totalPrimary - 4;
       if (showGM === "showDetails") { dmHtml = getDmHtml(dmsPrimary, dmsSecondary); }
-      highPsgrs = await displayChatCard(dmsTotal, game.i18n.localize('SPACE-TRADER.ROLLINGFOR.BasicPassengers'), this.actor);
+      highPsgrs = await displayChatCard(dmsTotal, game.i18n.localize('SPACE-TRADER.ROLLINGFOR.HighPassengers'), this.actor);
 
 
       if (highPsgrs + midPsgrs + basicPsgrs + lowPsgrs) {
@@ -306,20 +309,20 @@ export class SpaceTrader extends FormApplication {
       const cardContent = await renderTemplate(SpaceTrader.TEMPLATES.PASSENGERRESULTS, summaryData);
 
       const resultOptions = {
-        type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+        type: CONST.CHAT_MESSAGE_STYLES.OTHER,
         content: cardContent,
         speaker: ChatMessage.getSpeaker({ actor: this.actor })
       }
 
       if (!showPlayers) {
-        resultOptions.whisper = ChatMessage.getWhisperRecipients("GM");
+        resultOptions.whisper = getWhisperTargets(this.actor, shipOwnersCanUse);
       }
 
       ChatMessage.create(resultOptions);
 
 
       async function displayChatCard(dmsTotal, rollType, actor) {
-        const roll = await new Roll(formatRollFormula("2d6", dmsTotal)).evaluate({ async: true });
+        const roll = await new Roll(formatRollFormula("2d6", dmsTotal)).evaluate();
         const rollHtml = await roll.render();
         const val = getPassengerDice(roll.total);
 
@@ -333,7 +336,7 @@ export class SpaceTrader extends FormApplication {
 
         if (val[0].diceRoll != "0") {
           toRoll = `${game.i18n.localize('SPACE-TRADER.RollingFor')} ${val[0].diceDesc} ${game.i18n.localize('SPACE-TRADER.Passengers')}`
-          passengerRoll = await new Roll(val[0].diceRoll).evaluate({ async: true })
+          passengerRoll = await new Roll(val[0].diceRoll).evaluate()
           passengerHtml = await passengerRoll.render();
           if (show3dRolls) { game.dice3d?.showForRoll(passengerRoll); }
           passengerResult = `${passengerRoll.total} ${game.i18n.localize('SPACE-TRADER.Passengers')} ${game.i18n.localize('SPACE-TRADER.Found')}`
@@ -357,13 +360,13 @@ export class SpaceTrader extends FormApplication {
           let cardContent = await renderTemplate(SpaceTrader.TEMPLATES.PASSENGERROLL, rollData);
 
           const chatOptions = {
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            type: CONST.CHAT_MESSAGE_STYLES.OTHER,
             content: cardContent,
             speaker: ChatMessage.getSpeaker({ actor: actor })
           }
 
           if (!showPlayers) {
-            chatOptions.whisper = ChatMessage.getWhisperRecipients("GM");
+            chatOptions.whisper =  getWhisperTargets(actor, shipOwnersCanUse);
           }
 
 
@@ -415,13 +418,13 @@ export class SpaceTrader extends FormApplication {
     let cardContent = await renderTemplate(SpaceTrader.TEMPLATES.PASSENGERONBOARD, rollData);
 
     const resultOptions = {
-      type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+      type: CONST.CHAT_MESSAGE_STYLES.OTHER,
       content: cardContent,
       speaker: ChatMessage.getSpeaker({ actor: this.actor })
     }
 
     if (!showPlayers) {
-      resultOptions.whisper = ChatMessage.getWhisperRecipients("GM");
+      resultOptions.whisper = getWhisperTargets(this.actor, shipOwnersCanUse);
     }
 
     ChatMessage.create(resultOptions);
@@ -544,17 +547,17 @@ export class SpaceTrader extends FormApplication {
         this.freightList = [];
 
         for (let i = 0; i < majorLots; i++) {
-          const amount = await new Roll("1d6*10").evaluate({ async: true });
+          const amount = await new Roll("1d6*10").evaluate();
           this.freightList.push({ type: game.i18n.localize('SPACE-TRADER.FreightLot'), tons: amount.total, price: prices.freight * amount.total, checked: false, sort: amount.total });
         }
 
         for (let i = 0; i < minorLots; i++) {
-          const amount = await new Roll("1d6*5").evaluate({ async: true });
+          const amount = await new Roll("1d6*5").evaluate();
           this.freightList.push({ type: game.i18n.localize('SPACE-TRADER.FreightLot'), tons: amount.total, price: prices.freight * amount.total, checked: false, sort: amount.total });
         }
 
         for (let i = 0; i < incidentalLots; i++) {
-          const amount = await new Roll("1d6").evaluate({ async: true });
+          const amount = await new Roll("1d6").evaluate();
           this.freightList.push({ type: game.i18n.localize('SPACE-TRADER.FreightLot'), quantity: 1, tons: amount.total, price: prices.freight * amount.total, checked: false, sort: amount.total });
         }
 
@@ -579,19 +582,19 @@ export class SpaceTrader extends FormApplication {
       const cardContent = await renderTemplate(SpaceTrader.TEMPLATES.FREIGHTRESULTS, summaryData);
 
       const resultOptions = {
-        type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+        type: CONST.CHAT_MESSAGE_STYLES.OTHER,
         content: cardContent,
         speaker: ChatMessage.getSpeaker({ actor: this.actor })
       }
 
       if (!showPlayers) {
-        resultOptions.whisper = ChatMessage.getWhisperRecipients("GM");
+        resultOptions.whisper = getWhisperTargets(this.actor, shipOwnersCanUse);
       }
 
       ChatMessage.create(resultOptions);
 
       async function displayChatCard(dmsTotal, rollType, actor) {
-        const roll = await new Roll(formatRollFormula("2d6", dmsTotal)).evaluate({ async: true });
+        const roll = await new Roll(formatRollFormula("2d6", dmsTotal)).evaluate();
         const rollHtml = await roll.render();
         const val = getFreightDice(roll.total);
 
@@ -605,7 +608,7 @@ export class SpaceTrader extends FormApplication {
 
         if (val[0].diceRoll != "0") {
           toRoll = `${game.i18n.localize('SPACE-TRADER.RollingFor')} ${val[0].diceDesc} ${game.i18n.localize('SPACE-TRADER.Lots')}`
-          freightRoll = await new Roll(val[0].diceRoll).evaluate({ async: true })
+          freightRoll = await new Roll(val[0].diceRoll).evaluate()
           freightHtml = await freightRoll.render();
           if (show3dRolls) { game.dice3d?.showForRoll(freightRoll); }
           freightResult = `${freightRoll.total} ${game.i18n.localize('SPACE-TRADER.Lots')} ${game.i18n.localize('SPACE-TRADER.Found')}`
@@ -629,13 +632,13 @@ export class SpaceTrader extends FormApplication {
           let cardContent = await renderTemplate(SpaceTrader.TEMPLATES.FREIGHTROLL, rollData);
 
           const chatOptions = {
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            type: CONST.CHAT_MESSAGE_STYLES.OTHER,
             content: cardContent,
             speaker: ChatMessage.getSpeaker({ actor: actor })
           }
 
           if (!showPlayers) {
-            chatOptions.whisper = ChatMessage.getWhisperRecipients("GM");
+            chatOptions.whisper = getWhisperTargets(actor, shipOwnersCanUse);
           }
 
 
@@ -645,10 +648,10 @@ export class SpaceTrader extends FormApplication {
 
         return finalResult;
       }
-
+      
 
       async function displayMailChatCard(dmsTotal, rollType, actor) {
-        const roll = await new Roll(formatRollFormula("2d6", dmsTotal)).evaluate({ async: true });
+        const roll = await new Roll(formatRollFormula("2d6", dmsTotal)).evaluate();
         const rollHtml = await roll.render();
 
         if (show3dRolls) { game.dice3d?.showForRoll(roll); }
@@ -661,7 +664,7 @@ export class SpaceTrader extends FormApplication {
 
         if (roll.total >= 12) {
           toRoll = `${game.i18n.localize('SPACE-TRADER.RollingFor')} 1D ${game.i18n.localize('SPACE-TRADER.Containers')}`
-          freightRoll = await new Roll("1d6").evaluate({ async: true })
+          freightRoll = await new Roll("1d6").evaluate()
           freightHtml = await freightRoll.render();
           if (show3dRolls) { game.dice3d?.showForRoll(freightRoll); }
           freightResult = `${freightRoll.total} ${game.i18n.localize('SPACE-TRADER.Containers')} ${game.i18n.localize('SPACE-TRADER.Found')}`
@@ -685,13 +688,13 @@ export class SpaceTrader extends FormApplication {
           let cardContent = await renderTemplate(SpaceTrader.TEMPLATES.FREIGHTROLL, rollData);
 
           const chatOptions = {
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            type: CONST.CHAT_MESSAGE_STYLES.OTHER,
             content: cardContent,
             speaker: ChatMessage.getSpeaker({ actor: actor })
           }
 
           if (!showPlayers) {
-            chatOptions.whisper = ChatMessage.getWhisperRecipients("GM");
+            chatOptions.whisper = getWhisperTargets(actor, shipOwnersCanUse);
           }
 
 
@@ -741,13 +744,13 @@ export class SpaceTrader extends FormApplication {
     let cardContent = await renderTemplate(SpaceTrader.TEMPLATES.FREIGHTLOAD, rollData);
 
     const resultOptions = {
-      type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+      type: CONST.CHAT_MESSAGE_STYLES.OTHER,
       content: cardContent,
       speaker: ChatMessage.getSpeaker({ actor: this.actor })
     }
 
     if (!showPlayers) {
-      resultOptions.whisper = ChatMessage.getWhisperRecipients("GM");
+      resultOptions.whisper = getWhisperTargets(this.actor, shipOwnersCanUse);
     }
 
     ChatMessage.create(resultOptions);
@@ -817,7 +820,7 @@ export class SpaceTrader extends FormApplication {
 
 
         for (let i = 0; i < worldStats.population; i++) {
-          const roll = await new Roll("d6rr6*10+d6").evaluate({ async: true });
+          const roll = await new Roll("d6rr6*10+d6").evaluate();
           const roilHtml = roll.render();
           if (show3dRolls) { game.dice3d?.showForRoll(roll); }
           const item = getTradeGood(roll.total)[0];
@@ -866,13 +869,13 @@ export class SpaceTrader extends FormApplication {
         const cardContent = await renderTemplate(SpaceTrader.TEMPLATES.SPECBUYDEFAULTS, rollData);
 
         const resultOptions = {
-          type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+          type: CONST.CHAT_MESSAGE_STYLES.OTHER,
           content: cardContent,
           speaker: ChatMessage.getSpeaker({ actor: actor })
         }
 
         if (!showPlayers) {
-          resultOptions.whisper = ChatMessage.getWhisperRecipients("GM");
+          resultOptions.whisper = getWhisperTargets(actor, shipOwnersCanUse);
         }
 
         ChatMessage.create(resultOptions);
@@ -888,20 +891,20 @@ export class SpaceTrader extends FormApplication {
         const cardContent = await renderTemplate(SpaceTrader.TEMPLATES.SPECBUYROLL, rollData);
 
         const resultOptions = {
-          type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+          type: CONST.CHAT_MESSAGE_STYLES.OTHER,
           content: cardContent,
           speaker: ChatMessage.getSpeaker({ actor: actor })
         }
 
         if (!showPlayers) {
-          resultOptions.whisper = ChatMessage.getWhisperRecipients("GM");
+          resultOptions.whisper = getWhisperTargets(actor, shipOwnersCanUse);;
         }
 
         ChatMessage.create(resultOptions);
       }
 
       async function displayLegalCargoChatCard(dmsTotal, rollType, actor) {
-        const roll = await new Roll(formatRollFormula("1d6", dmsTotal)).evaluate({ async: true });
+        const roll = await new Roll(formatRollFormula("1d6", dmsTotal)).evaluate();
         const rollHtml = await roll.render();
 
         let itemCount = roll.total;
@@ -926,13 +929,13 @@ export class SpaceTrader extends FormApplication {
           let cardContent = await renderTemplate(SpaceTrader.TEMPLATES.SPECBUYAVAIL, rollData);
 
           const chatOptions = {
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            type: CONST.CHAT_MESSAGE_STYLES.OTHER,
             content: cardContent,
             speaker: ChatMessage.getSpeaker({ actor: actor })
           }
 
           if (!showPlayers) {
-            chatOptions.whisper = ChatMessage.getWhisperRecipients("GM");
+            chatOptions.whisper = getWhisperTargets(actor, shipOwnersCanUse);
           }
 
 
