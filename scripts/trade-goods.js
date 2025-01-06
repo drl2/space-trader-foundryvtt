@@ -58,7 +58,7 @@ export const TRADEGOODS = [
         },
         SaleDMs: {
             Po: 2,
-            Ag: 2
+            In: 2
         }
     },
     {
@@ -599,3 +599,35 @@ export const FREIGHTPRICES = [
     { parsecs: 5, high: 60000, middle: 40000, basic: 14000, low: 7200, freight: 8500 },
     { parsecs: 6, high: 210000, middle: 130000, basic: 55000, low: 27000, freight: 32000 }
 ] 
+
+export const PRICEMODS = [
+    { roll: -3, purchase: 3, sale: .1 },
+    { roll: -2, purchase: 2.5, sale: .2 },
+    { roll: -1, purchase: 2, sale: .3 },
+    { roll: 0, purchase: 1.75, sale: .4 },
+    { roll: 1, purchase: 1.5, sale: .45 },
+    { roll: 2, purchase: 1.35, sale: .5 },
+    { roll: 3, purchase: 1.25, sale: .55 },
+    { roll: 4, purchase: 1.2, sale: .6 },
+    { roll: 5, purchase: 1.15, sale: .65 },
+    { roll: 6, purchase: 1.1, sale: .7 },
+    { roll: 7, purchase: 1.05, sale: .75 },
+    { roll: 8, purchase: 1, sale: .8 },
+    { roll: 9, purchase: .95, sale: .85 },
+    { roll: 10, purchase: .9, sale: .9 },
+    { roll: 11, purchase: .85, sale: 1 },
+    { roll: 12, purchase: .8, sale: 1.05 },
+    { roll: 13, purchase: .75, sale: 1.1 },
+    { roll: 14, purchase: .7, sale: 1.15 },
+    { roll: 15, purchase: .65, sale: 1.2 },
+    { roll: 16, purchase: .6, sale: 1.25 },
+    { roll: 17, purchase: .55, sale: 1.3 },
+    { roll: 18, purchase: .5, sale: 1.4 },
+    { roll: 19, purchase: .45, sale: 1.5 },
+    { roll: 20, purchase: .4, sale: 1.6 },
+    { roll: 21, purchase: .35, sale: 1.75 },
+    { roll: 22, purchase: .3, sale: 2 },
+    { roll: 23, purchase: .25, sale: 2.5 },
+    { roll: 24, purchase: .2, sale: 3 },
+    { roll: 25, purchase: .15, sale: 4 }
+]

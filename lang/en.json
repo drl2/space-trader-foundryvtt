@@ -96,6 +96,16 @@
         "Sell": "Sell",
         "Buy": "Buy",
         "MustOwnTarget": "Must own target",
+        "Buyer": "Buyer",
+        "BasePrice": "Base Price",
+        "SpecGoodsAvailable": "Speculative Goods Available",
+        "Goods": "Goods",
+        "CostCr": "Cost (CR)",
+        "Purchase": "Purchase",
+        "Cancel": "Cancel",
+        "CargoPurchased": "Cargo Purchased",
+        "UnitCostCr": "Unit Cost (CR)",
+        "TotalCostCr": "Total Cost (CR)",
         "TRADE-CODES": {
             "Ag": "Ag",
             "AgTooltip": "Agricultural",
@@ -150,7 +160,8 @@
             "MissingQuery": "Query text cannot be empty",
             "BadStewardSkill": "Bad or missing Steward skill",
             "BadBrokerSkill": "Bad or missing Broker skill",
-            "BadParsecs": "Bad or missing travel distance in parsecs"
+            "BadParsecs": "Bad or missing travel distance in parsecs",
+            "InvalidPurchaseAmount": "Invalid purchase amount"
         },
         "WARNINGS": {
             "NoWorldFound": "Unable to find any worlds matching that search",
@@ -216,7 +227,9 @@
             "Mail": "Rolling for Mail",
             "RandomTradeGoods": "Random Trade Goods",
             "CommonTradeGoods": "Common Trade Goods",
-            "TradeCodeGoods": "Goods by Trade Code"
+            "TradeCodeGoods": "Goods by Trade Code",
+            "TradeGoodsTonnage": "Trade Goods Tonnage",
+            "TradeGoodsPurchasePrice": "Trade Goods Purchase Price"
         },
         "PASSENGERTYPES": {
             "HighPsgr": "High Passengers",
@@ -245,6 +258,12 @@
             "FindBlackMarketBuyerRoll": "8+ Streetwise check (1D days, EDU or SOC)",
             "FindOnlineBuyer": "Find an online buyer or broker",
             "FindOnlineBuyerRoll": "8+ Admin check (1D hours, EDU)"
+        },
+        "SPECTRADEDMS": {
+            "Buy": "Purchase DM",
+            "Sell": "Sale DM",
+            "Supplier": "Supplier Broker DM",
+            "Traveller": "Traveller Broker DM"
         },
         "TRADEGOODNAMES": {
             "CommonElectronics":	"Common Electronics",

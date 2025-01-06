@@ -3,8 +3,8 @@
     <br />
 
     {{#each detailRolls}}
-        {{{this.rollHtml}}}
         {{localize (concat 'SPACE-TRADER.TRADEGOODNAMES.' this.item.Name)}}
+        {{{this.rollHtml}}}
         <br /><br />
     {{/each}}
 

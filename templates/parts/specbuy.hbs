@@ -35,20 +35,18 @@
                 <div class="space-trader-column-header">{{localize 'SPACE-TRADER.Tons'}}</div>
                 <div class="space-trader-column-header">{{localize 'SPACE-TRADER.BasePriceCr'}}</div>
                 <div class="space-trader-column-header">{{localize 'SPACE-TRADER.BuyPriceCr'}}</div>
-                <div class="space-trader-column-header">{{localize 'SPACE-TRADER.Legal'}}</div>
 
-
-                <div>
-                    <a class="item-control buy" data-rolltype="buy" title="{{localize 'SPACE-TRADER.Buy'}}">
-                        <i class="fas fa-dollar-sign"></i>
-                    </a>
-                </div>
-                <div>Buy button on each line</div>
-                <div>3</div>
-                <div>4</div>
-                <div>5</div>
-                <div>Yes</div>
-
+                {{#each specBuyList}}
+                    <div>
+                        <a class="item-control buy purchase-spec" data-rolltype="buy" data-id="{{@this.key}}" title="{{localize 'SPACE-TRADER.Buy'}}">
+                            <i class="fas fa-dollar-sign"></i>
+                        </a>
+                    </div>
+                    <div>{{localize (concat 'SPACE-TRADER.TRADEGOODNAMES.' this.type)}}</div>
+                    <div>{{{this.tons}}}</div>
+                    <div>{{{this.base}}}</div>
+                    <div style="{{ifThen (eq this.relativeValue -1) 'color:green;' ''}}{{ifThen (eq this.relativeValue 1) 'color:red;' ''}}">{{{this.sell}}}</div>
+                {{/each}}
 
             </div>
 

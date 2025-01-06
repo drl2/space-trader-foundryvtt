@@ -1,4 +1,4 @@
-import { FREIGHTPRICES, FREIGHTROLLS, PASSENGERROLLS, TRADEGOODS } from './trade-goods.js';
+import { FREIGHTPRICES, FREIGHTROLLS, PASSENGERROLLS, TRADEGOODS, PRICEMODS } from './trade-goods.js';
 
 export function log(force, ...args) {
     const shouldLog = force || game.modules.get('_dev-mode')?.api?.getPackageDebugValue(this.ID);
@@ -29,7 +29,6 @@ export function registerSettings(id) {
         config: true,
         choices: {
             "resultsOnly": `SPACE-TRADER.ResultsOnly`,
-            "showRolls": `SPACE-TRADER.ShowRolls`,
             "showDetails": `SPACE-TRADER.ShowDetails`
         }
     })
@@ -81,18 +80,18 @@ export function registerSettings(id) {
 }
 
 export function getWhisperTargets(actor, shipOwnersCanUse) {
-     if (shipOwnersCanUse) {
+    if (shipOwnersCanUse) {
         return Object.entries(actor.ownership).filter(([key, value]) => value === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER).map(x => x[0]);
-     }
-     else {return ChatMessage.getWhisperRecipients("GM");}
+    }
+    else { return ChatMessage.getWhisperRecipients("GM"); }
 }
 
 export function isShipOwner(actor, shipOwnersCanUse) {
     return ((actor.type === "ship")
-    && (
-      game.user.isGM
-      || (shipOwnersCanUse && (actor.ownership[game.user.id] === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER))
-    )
+        && (
+            game.user.isGM
+            || (shipOwnersCanUse && (actor.ownership[game.user.id] === CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER))
+        )
     )
 }
 
@@ -260,30 +259,85 @@ export function getSpecBuyPopDM(pop) {
 }
 
 export function getCommonGoods() {
-    return TRADEGOODS.filter(item => 
+    return TRADEGOODS.filter(item =>
         (item.D66 <= 16)
-        )
+    )
 }
 
 export function getTradeGoods(codes, legal) {
     const keys = Object.keys(codes);
-    const findCodes = keys.filter(key => (codes[key] === true) );
+    const findCodes = keys.filter(key => (codes[key] === true));
 
 
     return TRADEGOODS.filter(item => {
-        if (legal && item.D66 >= 61) {return false;}
-        if (!legal && item.D66 <= 56) {return false;}
-        
+        if (legal && item.D66 >= 61) { return false; }
+        if (!legal && item.D66 <= 56) { return false; }
+
         let value = 0;
-        findCodes.forEach(function(code) {
+        findCodes.forEach(function (code) {
             value = value + item.Availability.indexOf(code) !== -1;
         })
         return (value > 0);
     }
-    ); 
+    );
 }
 
 export function getTradeGood(roll) {
-    return TRADEGOODS.filter(item => (item.D66 == roll) );
+    return TRADEGOODS.filter(item => (item.D66 == roll));
 }
 
+export function getTradeGoodDMs(name, config) {
+    const goods = TRADEGOODS.filter(item => (item.Name == name));
+    const keys = Object.keys(config.tradeCodes);
+    const tradeCodes = keys.filter(function (key) {
+        return config.tradeCodes[key];
+    });
+
+    const buyDm = getHighestSpecBuyDM(tradeCodes, goods[0].PurchaseDMs);
+    const sellDm = getHighestSpecBuyDM(tradeCodes, goods[0].SaleDMs);
+
+    return {
+        buyDm: buyDm,
+        sellDm: sellDm,
+        travBroker: config.travBrokerSkill,
+        supplierBroker: config.supplierBrokerSkill
+    };
+}
+
+function getHighestSpecBuyDM(tradeCodes, dms) {
+    const filtered = Object.keys(dms)
+        .filter(key => tradeCodes.includes(key));
+
+    let maxDM = 0;
+    let dmName = "";
+
+    if (filtered.length != 0) {
+        for (var idx in dms) {
+            if (filtered.includes(idx)) {
+                if (dms[idx] > maxDM) {
+                    maxDM = dms[idx];
+                    dmName = idx;
+                }
+            }
+        }
+    }
+
+    return { name: dmName, dm: maxDM };
+}
+
+
+export function getPurchaseMod(roll) {
+    if (roll > 25) { roll = 25 };
+    if (roll < -3) { roll = -3 };
+
+    const val = PRICEMODS.filter(row => (row.roll == roll));
+    return val[0].purchase;
+}
+
+export function getSaleMod(roll) {
+    if (roll > 25) { roll = 25 };
+    if (roll < -3) { roll = -3 };
+
+    const val = PRICEMODS.filter(row => (row.roll == roll));
+    return val[0].sale;
+}

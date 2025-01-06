@@ -191,12 +191,12 @@
 
 .space-trader-specbuy-detail {
     display: grid;
-    grid-template-columns: 30px 200px 40px 100px 100px 40px;
+    grid-template-columns: 30px 230px 40px 100px 100px;
 }
 
 .space-trader-specsell-detail {
     display: grid;
-    grid-template-columns: 30px 200px 40px 100px 100px 40px;
+    grid-template-columns: 30px 230px 40px 100px 100px;
 }
 
 .item-control {

@@ -1,0 +1,27 @@
+<div class="st-chatcard">
+    <span style="font-weight: bold">{{localize 'SPACE-TRADER.CargoPurchased'}}</span>
+    <br />
+
+        {{localize (concat 'SPACE-TRADER.TRADEGOODNAMES.' this.item.type)}}
+
+        <table>
+            <tr>
+                <td>{{localize 'SPACE-TRADER.Tons'}}</td>
+                <td>{{{this.tons}}}</td>
+            </tr>
+            <tr>
+                <td>{{localize 'SPACE-TRADER.UnitCostCr'}}</td>
+                <td>{{{this.item.sell}}}</td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold">{{localize 'SPACE-TRADER.TotalCostCr'}}</td>
+                <td style="font-weight: bold">{{{this.total}}}</td>
+            </tr>
+        </table>
+        <span style="font-weight: bold;color: {{{this.legalColor}}}">
+            {{{this.legality}}}
+        </span>
+        <br /><br />
+
+</div>
+
