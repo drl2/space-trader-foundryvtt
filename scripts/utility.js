@@ -249,6 +249,24 @@ export function getFreight(actor) {
         && item.flags["space-trader"]?.isFreight));
 }
 
+export function getSpecCargo(actor, isLegal, localLawLevel) {
+    return actor.items.filter(item => (item.type == "component"
+        && item.system.subtype === "cargo"
+        && item.flags["space-trader"]?.isSpecBuy
+        && (isLegalHere(!item.system.isIllegal, item.flags["space-trader"]?.lawLevel ?? 0, localLawLevel) === isLegal)
+    ));
+}
+
+function isLegalHere(isLegal, itemLawLevel, localLawLevel)
+{
+    let result = isLegal;
+    if (isLegal && itemLawLevel) { 
+        let llDiff = localLawLevel - itemLawLevel;
+        if (llDiff > 0) {result = false;}
+    }
+    return result;
+}
+
 export function getSpecBuyPopDM(pop) {
     let dm = 0;
 

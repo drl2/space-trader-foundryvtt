@@ -194,9 +194,9 @@
     grid-template-columns: 30px 230px 40px 100px 100px;
 }
 
-.space-trader-specsell-detail {
+.space-trader-specsell-illegal-detail {
     display: grid;
-    grid-template-columns: 30px 230px 40px 100px 100px;
+    grid-template-columns: 30px 230px 40px 45px 90px 90px;
 }
 
 .item-control {

@@ -90,7 +90,6 @@
         "Legality": "Legality",
         "Legal": "Legal",
         "Illegal": "Illegal",
-        "LLDiff": "LL Diff",
         "GetSalePrices": "Get Sale Prices",
         "LLDiffTooltip": "World law level - banned law level",
         "Sell": "Sell",
@@ -106,6 +105,8 @@
         "CargoPurchased": "Cargo Purchased",
         "UnitCostCr": "Unit Cost (CR)",
         "TotalCostCr": "Total Cost (CR)",
+        "LLDiff": "LL Diff",
+        "LawLevel": "Law Level",
         "TRADE-CODES": {
             "Ag": "Ag",
             "AgTooltip": "Agricultural",

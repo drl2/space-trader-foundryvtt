@@ -16,32 +16,50 @@
     <div>
 
         <div class="space-trader-spec-buttondiv">
-            <div>
-                <input type="checkbox" name="includeIllegal" class="toggle-include-illegal"
-                    title="{{localize 'SPACE-TRADER.IncludeIllegal'}}" data-dtype="Boolean" />
-                <label>{{localize 'SPACE-TRADER.IncludeIllegal'}}</label>
-
+            <div class="space-trader-lower-text">
+                <label class="space-trader-lower-text">{{localize "SPACE-TRADER.Legality"}}:</label>
+                <select name="specSell.isLegal" value="specSell.isLegal" class="space-trader-specsell-islegal">
+                    {{selectOptions LEGAL selected=specSell.isLegal localize=true}}
+                </select>
             </div>
             <div>
-                <button class="specbuy-get-button space-trader-get-button"
+                <button class="specsell-get-button space-trader-get-button"
                     title="{{localize 'SPACE-TRADER.GetSalePrices'}}">
                     {{localize 'SPACE-TRADER.GetSalePrices'}}</button>
             </div>
         </div>
 
-        <div class="space-trader-specsell-list">
-            <div class="space-trader-specsell-detail">
-               <div>&nbsp;</div>
+        <div class="space-trader-specbuy-list">
+            <div class="{{ifThen specSell.isLegal 'space-trader-specbuy-detail' 'space-trader-specsell-illegal-detail'}}">
+                <div>&nbsp;</div>
                 <div class="space-trader-column-header">{{localize 'SPACE-TRADER.Type'}}</div>
                 <div class="space-trader-column-header">{{localize 'SPACE-TRADER.Tons'}}</div>
+                {{#unless specSell.isLegal}}
+                    <div class="space-trader-column-header">{{localize 'SPACE-TRADER.LLDiff'}}</div>
+                {{/unless}}
                 <div class="space-trader-column-header">{{localize 'SPACE-TRADER.BoughtPriceCr'}}</div>
                 <div class="space-trader-column-header">{{localize 'SPACE-TRADER.OfferCr'}}</div>
-                <div class="space-trader-column-header">{{localize 'SPACE-TRADER.Legal'}}</div>
- </div>
 
- need sell on each line w/popup for # of tons, law level diff if illegal
+
+                {{#each specSellList}}
+                <div>
+                    <a class="item-control buy purchase-spec" data-rolltype="sell" data-id="{{@this.key}}"
+                        title="{{localize 'SPACE-TRADER.Sell'}}">
+                        <i class="fas fa-dollar-sign"></i>
+                    </a>
+                </div>
+                <div>{{{this.name}}}</div>
+                <div>{{{this.tons}}}</div>
+                {{#unless ../specSell.isLegal}}
+                    <div>{{this.llDiff}}</div>
+                {{/unless}}
+                <div>{{{this.purchasePrice}}}</div>
+                <div
+                    style="{{ifThen (eq this.relativeValue -1) 'color:green;' ''}}{{ifThen (eq this.relativeValue 1) 'color:red;' ''}}">
+                    {{{this.sell}}}</div>
+                {{/each}}
+
+            </div>
 
         </div>
-
     </div>
-</div>
