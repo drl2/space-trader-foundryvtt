@@ -1,4 +1,5 @@
-<div class="space-trader-passenger-page">
+<section class="tab" data-tab="passengers" data-group="sheet">
+<div class="space-trader-passenger-content">
     <div class="space-trader-lower-text" title="{{localize 'SPACE-TRADER.PassengerEffect'}}">
         <label>{{localize "SPACE-TRADER.PassengerEffect"}}: </label>
         <input class="space-trader-number-input" type="text" value="{{passengers.brokerRollEffect}}"
@@ -6,9 +7,9 @@
     </div>
     <div>&nbsp;</div>
     <div>
-        <button class="passenger-button space-trader-get-button" title="{{localize 'SPACE-TRADER.GetPassengers'}}">
-            {{localize
-            'SPACE-TRADER.GetPassengers'}}</button>
+        <button data-action="passenger" class="space-trader-get-button" title="{{localize 'SPACE-TRADER.GetPassengers'}}">
+            {{localize 'SPACE-TRADER.GetPassengers'}}
+        </button>
     </div>
 
     <div class="space-trader-passenger-list">
@@ -24,7 +25,7 @@
 
             {{#each passengerList}}
             <div><input type="checkbox" name="passengerList.{{@this.key}}" {{checked this.checked}}
-                    data-id="{{@this.key}}" class="toggle-single-passenger" /></div>
+                    data-id="{{@this.key}}" data-action="togglePassenger" /></div>
             <div class="space-trader-lower-text">{{this.type}}</div>
             <div class="space-trader-lower-text">{{this.price}}</div>
             <div>&nbsp;</div>
@@ -33,7 +34,7 @@
         </div>
     </div>
     <div class="space-trader-lower-text">
-        <input type="checkbox" name="toggleAll" class="toggle-all-passengers"
+        <input type="checkbox" name="toggleAll" data-action="toggleAllPassengers"
             title="{{localize 'SPACE-TRADER.ToggleAll'}}" data-dtype="Boolean" {{checked passengers.allChecked}}
             {{disabled passengers.none}} />
         <label>{{localize 'SPACE-TRADER.ToggleAll'}}</label>
@@ -44,9 +45,10 @@
         {{maxMid}} {{localize 'SPACE-TRADER.PASSENGERTYPES.Middle'}}
     </div>
     <div>
-        <button class="onboard-button space-trader-get-button" title="{{localize 'SPACE-TRADER.OnBoardTooltip'}}"
+        <button data-action="onboard" class="space-trader-get-button" title="{{localize 'SPACE-TRADER.OnBoardTooltip'}}"
             {{disabled passengers.noneSelected}}>
-            {{localize
-            'SPACE-TRADER.OnBoard'}}</button>
+            {{localize 'SPACE-TRADER.OnBoard'}}
+        </button>
     </div>
 </div>
+</section>

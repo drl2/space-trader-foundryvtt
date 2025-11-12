@@ -1,7 +1,8 @@
+<section class="tab" data-tab="settings" data-group="sheet">
                     <div class="space-trader-settings-grid">
                         <div>
                             <h3>{{localize "SPACE-TRADER.World"}}
-                                <button class="space-trader-search-button"><i class="fas fa-magnifying-glass"
+                                <button data-action="search"><i class="fas fa-magnifying-glass"
                                         title="{{localize 'SPACE-TRADER.LookUp'}}"></i></button>
                             </h3>
 
@@ -26,11 +27,7 @@
                                 <div class="space-trader-codes">
                                     <label>{{localize "SPACE-TRADER.TravelCode"}}</label>
                                     <select name="config.travelCode">
-                                        {{#select config.travelCode}}
-                                        <option value="0">{{localize 'SPACE-TRADER.TRAVEL-CODES.None'}}</option>
-                                        <option value="1">{{localize 'SPACE-TRADER.TRAVEL-CODES.Amber'}}</option>
-                                        <option value="2">{{localize 'SPACE-TRADER.TRAVEL-CODES.Red'}}</option>
-                                        {{/select}}
+                                        {{selectOptions travelCodeOptions selected=config.travelCode valueAttr="value" labelAttr="label"}}
                                     </select>
                                 </div>
                             </div>
@@ -92,11 +89,8 @@
                             <h3>{{localize "SPACE-TRADER.Settings"}}</h3>
                             <label>{{localize "SPACE-TRADER.MoneyChar"}}: </label>
                             <select name="config.moneyTargetId">
-                                {{#select config.moneyTargetId}}
-                                {{#each pcs as |val|}}
-                                <option value="{{val.id}}">{{val.name}}</option>
-                                {{/each}}
-                                {{/select}}
+                                {{selectOptions pcs selected=config.moneyTargetId valueAttr="id" labelAttr="name"}}
                             </select>
                         </div>
                     </div>
+</section>
