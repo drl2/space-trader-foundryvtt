@@ -1,3 +1,12 @@
+/* Tab system CSS - ensures proper tab hiding */
+.tab-content section.tab {
+    display: none;
+}
+
+.tab-content section.tab.active {
+    display: block;
+}
+
 .space-trader-settings-grid {
     display: grid;
     grid-template-columns: 200px 200px 200px;
@@ -85,7 +94,7 @@
     width: 60px !important;
 }
 
-.space-trader-passenger-page {
+.space-trader-passenger-content {
     display: grid;
     grid-template-columns: 1fr 160px;
 }
@@ -115,7 +124,7 @@
     padding-bottom: 4px;
 }
 
-.space-trader-freight-page {
+.space-trader-freight-content {
     display: grid;
     grid-template-columns: 1fr 160px;
 }

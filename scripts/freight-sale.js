@@ -1,50 +1,50 @@
 import { getFreight, hasChecked, getChecked } from './utility.js';
 
 
-export class FreightSale extends FormApplication {
-    static ID = 'space-trader';
+export class FreightSale extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
+    static ID = 'freight-sale';
 
     static TEMPLATES = {
-        FREIGHTSALEWINDOW: `modules/${FreightSale.ID}/templates/freight-sale.hbs`,
-        FREIGHTSALECARD: `modules/${FreightSale.ID}/templates/chatcards/freightsale.hbs`
+        FREIGHTSALEWINDOW: `modules/space-trader/templates/freight-sale.hbs`,
+        FREIGHTSALECARD: `modules/space-trader/templates/chatcards/freightsale.hbs`
     }
   static FLAGS = {
     CONFIG: 'config'
   }
 
-    static get defaultOptions() {
-        const defaults = super.defaultOptions;
-
-        const overrides = {
-            height: 'auto',
+    static DEFAULT_OPTIONS = {
+        id: "freight-sale",
+        tag: "form",
+        window: {
+            title: "SPACE-TRADER.DeliverFreight",
+            resizable: true
+        },
+        position: {
             width: 450,
-            id: 'freight-sale',
-            template: this.TEMPLATES.FREIGHTSALEWINDOW,
-            closeOnSubmit: false,
-            title: game.i18n.localize('SPACE-TRADER.DeliverFreight')
-        };
-        const mergedOptions = foundry.utils.mergeObject(defaults, overrides);
+            height: "auto"
+        },
+        form: {
+            submitOnChange: true,
+            closeOnSubmit: false
+        },
+        actions: {
+            deliver: this.#onDeliverClick,
+            toggleAll: this.#onToggleAllClick,
+            toggle: this.#onToggleClick
+        }
+    };
 
-        return mergedOptions;
-    }
+    static PARTS = {
+        form: {
+            template: "modules/space-trader/templates/freight-sale.hbs"
+        }
+    };
 
-    constructor(traderApp, options) {
+    constructor(traderApp, options = {}) {
         super(options);
         this.actor = traderApp.actor;
         this.traderApp = traderApp;
         this.populateFreight();
-
-        // this.freight = getFreight(this.actor);
-        // this.allChecked = false;
-        // this.noFreight = this.freight.length == 0;
-        // this.freightList = [];
-
-        // for (let i = 0; i < this.freight.length; i++) {
-        //     this.freightList.push({
-        //         id: this.freight[i].id, type: this.freight[i].name, tons: this.freight[i].system.weight,
-        //         price: this.freight[i].system.purchasePrice, checked: false
-        //     });
-        // }
     }
 
     populateFreight() {
@@ -61,7 +61,7 @@ export class FreightSale extends FormApplication {
         }
     }
 
-    async getData() {
+    async _prepareContext(options) {
         return {
             freightList: this.freightList,
             allChecked: this.allChecked,
@@ -69,36 +69,48 @@ export class FreightSale extends FormApplication {
         }
     }
 
-    async _updateObject(event, formData) {
+    async _onSubmit(formData) {
         const data = foundry.utils.expandObject(formData);
         this.query = data.query;
     }
 
-    activateListeners(html) {
-        super.activateListeners(html);
-        html.on('change', ".toggle-all-freight", this._handleAllFreightToggle.bind(this));
-        html.on('change', ".toggle-single-freight", this._handleFreightToggle.bind(this));
-        html.on('click', ".deliver-button", this._handleDeliverFreightClick.bind(this));
+    _attachPartListeners(partId, htmlElement, options) {
+        // AppV2 handles actions automatically - no manual event listeners needed
     }
 
+    // Static private action handlers
+    static #onDeliverClick(event, target) {
+        this._handleDeliverFreightClick(event);
+    }
+
+    static #onToggleAllClick(event, target) {
+        this._handleAllFreightToggle(event);
+    }
+
+    static #onToggleClick(event, target) {
+        const id = target.dataset.id;
+        this.freightList[id].checked = !this.freightList[id].checked;
+        const checked = hasChecked(this.freightList);
+        this.noneSelected = !checked;
+        this.render(true);
+    }
 
     async _handleAllFreightToggle(event) {
         this.allChecked = !this.allChecked;
         this.freightList.forEach(item => item.checked = this.allChecked);
         this.noneSelected = !this.allChecked;
         await this.render(true);
-      }
-    
-    
-      async _handleFreightToggle(event) {
+    }
+
+    async _handleFreightToggle(event) {
         const id = event.currentTarget.dataset.id;
         this.freightList[id].checked = !this.freightList[id].checked;
         const checked = hasChecked(this.freightList);
         this.noneSelected = !checked;
         await this.render(true);
-      }
+    }
 
-      async _handleDeliverFreightClick(event) {
+    async _handleDeliverFreightClick(event) {
         const showPlayers = game.settings.get(FreightSale.ID, 'showPlayers');
         const config = this.actor.getFlag(FreightSale.ID, FreightSale.FLAGS.CONFIG);
         const checkedList = getChecked(this.freightList);
@@ -111,10 +123,10 @@ export class FreightSale extends FormApplication {
             totalWeight: totalWeight
           }
 
-        let cardContent = await renderTemplate(FreightSale.TEMPLATES.FREIGHTSALECARD, rollData);
+        let cardContent = await foundary.applications.handlebars.renderTemplate(FreightSale.TEMPLATES.FREIGHTSALECARD, rollData);
 
         const resultOptions = {
-          type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+          type: CONST.CHAT_MESSAGE_STYLES.OTHER,
           content: cardContent,
           speaker: ChatMessage.getSpeaker({ actor: this.actor })
         }
@@ -144,9 +156,5 @@ export class FreightSale extends FormApplication {
         
         await this.traderApp.render(true); // just to update deliver button
         await this.render(true);
-
-      }
-
-
-
+    }
 }

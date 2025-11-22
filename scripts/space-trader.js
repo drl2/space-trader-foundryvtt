@@ -13,7 +13,7 @@ import { FreightSale } from './freight-sale.js';
 
 Hooks.once('init', async function () {
   registerSettings(SpaceTrader.ID);
-  await loadTemplates({
+  await foundry.applications.handlebars.loadTemplates({
     settings: "/modules/space-trader/templates/parts/settings.hbs",
     passengers: "/modules/space-trader/templates/parts/passengers.hbs",
     freight: "/modules/space-trader/templates/parts/freight.hbs",
@@ -26,64 +26,78 @@ Hooks.once('devModeReady', ({ registerPackageDebugFlag }) => {
   registerPackageDebugFlag(SpaceTrader.ID);
 });
 
-Hooks.on("renderChatMessage", (app, html, data) => Chat.toggleChatDetails(app, html, data));
+Hooks.on("renderChatMessageHTML", (app, html, data) => Chat.toggleChatDetails(app, html, data));
 
 Hooks.on("renderTokenHUD", async (hud, html, token) => {
   const actor = game.actors.get(token.actorId);
   if (!(game.user.isGM && actor.type == "ship")) return;
 
-  const button = $(`
-     <div class="control-icon">
-       <img src="icons/svg/coins.svg" width="36" height="36" title="${game.i18n.localize('SPACE-TRADER.TradingMenu')}"/>
-     </div>
-   `)
+  const button = document.createElement('div');
+  button.className = 'control-icon';
+  button.innerHTML = `<img src="icons/svg/coins.svg" width="36" height="36" title="${game.i18n.localize('SPACE-TRADER.TradingMenu')}"/>`;
 
-  button.on('click', () => {
+  button.addEventListener('click', () => {
     showTradeWindow(actor);
-  })
+  });
 
-  html.find('div.right').append(button);
+  // Convert jQuery object to DOM element if necessary
+  const htmlElement = html instanceof HTMLElement ? html : html[0] || html.get?.(0);
+  htmlElement.querySelector('div.right')?.appendChild(button);
 
 })
 
-Hooks.on("getActorDirectoryEntryContext", async (html, menuItems) => {
-  menuItems.push({
+// Use the correct Foundry hook for context menus
+Hooks.on("getActorContextOptions", (html, entryOptions) => {
+  entryOptions.push({
     name: "SPACE-TRADER.TradingMenu",
-    icon: `<i class="fa fa-coins"></i>`,
-    callback: async (html) => {
-      const actorId = html[0].dataset.documentId;
+    icon: '<i class="fa fa-coins"></i>',
+    condition: li => {
+      const actorId = li.dataset.entryId || li.dataset.documentId || 
+                      li.getAttribute('data-entry-id') || li.getAttribute('data-document-id');
+      const actor = game.actors.get(actorId);
+      return game.user.isGM && actor?.type === "ship";
+    },
+    callback: li => {
+      const actorId = li.dataset.entryId || li.dataset.documentId || 
+                      li.getAttribute('data-entry-id') || li.getAttribute('data-document-id');
       const actor = game.actors.get(actorId);
       showTradeWindow(actor);
-    },
-    condition: (html) => {
-      const actorId = html[0].dataset.documentId;
-      const actor = game.actors.get(actorId);
-      return game.user.isGM && (actor.type == "ship");
     }
-  })
-})
+  });
+});
 
-Hooks.on("renderActorSheet", async (app, html) => {
+Hooks.on("renderActorSheetV2", async (app, html) => {
   const actor = app.actor;
   if (!(game.user.isGM && actor.type == "ship")) return;
 
-  const button = $(`<button class="space-trader-cargo-button"><i class="fa fa-coins"></i> ${game.i18n.localize('SPACE-TRADER.TradingMenu')}</button>`);
+  const buttonContainer = document.createElement('span');
+  buttonContainer.className = 'ship-stat centre';
+  buttonContainer.innerHTML = `<button class="space-trader-cargo-button"><i class="fa fa-coins"></i> ${game.i18n.localize('SPACE-TRADER.TradingMenu')}</button>`;
 
-  button.on('click', () => {
+  const button = buttonContainer.querySelector('.space-trader-cargo-button');
+  button.addEventListener('click', () => {
     showTradeWindow(actor);
-  })
+  });
 
-  const loc = html.find(".cargo-weight");
-  loc.append(button);
+  // Convert jQuery object to DOM element if necessary
+  const htmlElement = html instanceof HTMLElement ? html : html[0] || html.get?.(0);
+  const loc = htmlElement.querySelector(".cargo-weight");
+  loc?.appendChild(buttonContainer);
 })
 
 
 function showTradeWindow(actor) {
-  new SpaceTrader(actor, { title: `${actor.name}  ${game.i18n.localize('SPACE-TRADER.window-title')}` }).render(true);
+  try {
+    const tradeWindow = new SpaceTrader(actor, { title: `${actor.name}  ${game.i18n.localize('SPACE-TRADER.window-title')}` });
+    tradeWindow.render(true);
+  } catch (error) {
+    console.error("SpaceTrader: Error creating trade window:", error);
+    ui.notifications.error(`Trade window error: ${error.message}`);
+  }
 }
 
 
-export class SpaceTrader extends FormApplication {
+export class SpaceTrader extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
 
   static ID = 'space-trader';
   static TEMPLATES = {
@@ -100,94 +114,306 @@ export class SpaceTrader extends FormApplication {
     ISFREIGHT: 'isFreight'
   }
 
-  constructor(actor, options) {
-    super(options);
-    this.actor = actor;
-    this.passengers = {
-      brokerRollEffect: 0,
-      noneSelected: true,
-      none: true,
-      allChecked: false
+  static DEFAULT_OPTIONS = {
+    id: "space-trader",
+    tag: "form",
+    window: {
+      title: "SPACE-TRADER.window-title",
+      icon: "fa-solid fa-coins",
+      resizable: true
+    },
+    position: {
+      width: 800,
+      height: "auto"
+    },
+    form: {
+      submitOnChange: true,
+      closeOnSubmit: false
+    },
+    actions: {
+      search: this.#onSearchClick,
+      passenger: this.#onPassengerClick,
+      onboard: this.#onBoardClick,
+      freight: this.#onFreightClick,
+      load: this.#onLoadCargoClick,
+      deliver: this.#onDeliverFreightClick,
+      toggleAllPassengers: this.#onAllPassengersToggle,
+      togglePassenger: this.#onPassengerToggle,
+      toggleAllFreight: this.#onAllFreightToggle,
+      toggleFreight: this.#onFreightToggle
     }
-    this.passengerList = [];
-    this.freight = {
-      brokerRollEffect: 0,
-      noneSelected: true,
-      none: true,
-      allChecked: false,
-      noCargo: getFreight(actor).length == 0
-    }
-    this.freightList = [];
+  };
 
+  constructor(actor, options = {}) {
+    try {
+      super(options);
+      this.actor = actor;
+      this.passengers = {
+        brokerRollEffect: 0,
+        noneSelected: true,
+        none: true,
+        allChecked: false
+      }
+      this.passengerList = [];
+      this.freight = {
+        brokerRollEffect: 0,
+        noneSelected: true,
+        none: true,
+        allChecked: false,
+        noCargo: getFreight(actor).length == 0
+      }
+      this.freightList = [];
+    } catch (error) {
+      console.error("SpaceTrader: FATAL ERROR in constructor:", error);
+      throw error; // Re-throw to prevent broken instance
+    }
   }
 
   get title() {
     return `${this.actor.name} - ${game.i18n.localize('SPACE-TRADER.window-title')}`;
   }
 
-  static get defaultOptions() {
-    const defaults = super.defaultOptions;
+  static PARTS = {
+    form: {
+      template: "/modules/space-trader/templates/space-trader.hbs"
+    },
+    settings: {
+      template: "/modules/space-trader/templates/parts/settings.hbs"
+    },
+    passengers: {
+      template: "/modules/space-trader/templates/parts/passengers.hbs"
+    },
+    freight: {
+      template: "/modules/space-trader/templates/parts/freight.hbs"
+    },
+    specbuy: {
+      template: "/modules/space-trader/templates/parts/specbuy.hbs"
+    },
+    specsell: {
+      template: "/modules/space-trader/templates/parts/specsell.hbs"
+    }
+  };
 
-    const overrides = {
-      height: 'auto',
-      width: 800,
-      id: 'space-trader',
-      template: this.TEMPLATES.TRADEWINDOW,
-      closeOnSubmit: false,
-      submitOnChange: true,
-      tabs: [{ navSelector: ".tabs", contentSelector: ".content", initial: "settings" }]
-    };
+  static TABS = {
+    sheet: {
+      tabs: [
+        {id: "settings", group: "sheet", label: "SPACE-TRADER.Settings"},
+        {id: "passengers", group: "sheet", label: "SPACE-TRADER.Passengers"},
+        {id: "freight", group: "sheet", label: "SPACE-TRADER.Freight"},
+        {id: "specbuy", group: "sheet", label: "SPACE-TRADER.SpecBuy"},
+        {id: "specsell", group: "sheet", label: "SPACE-TRADER.SpecSell"}
+      ],
+      initial: "settings"
+    }
+  };
 
-    const mergedOptions = foundry.utils.mergeObject(defaults, overrides);
+  async _prepareContext(options) {
+    try {
+      if (this.actor.getFlag(SpaceTrader.ID, SpaceTrader.FLAGS.CONFIG) === undefined) {
+        await this.actor.setFlag(SpaceTrader.ID, SpaceTrader.FLAGS.CONFIG, TradeConfig.getNew());
+      }
 
-    return mergedOptions;
+      const config = this.actor.getFlag(SpaceTrader.ID, SpaceTrader.FLAGS.CONFIG);
+
+      const context = {
+        tabs: this.constructor.TABS,
+        tradeCodes: TRADECODES,
+        config: config,
+        pcs: SpaceTrader.getActors(),
+        travelCodeOptions: [
+          { value: "0", label: game.i18n.localize('SPACE-TRADER.TRAVEL-CODES.None') },
+          { value: "1", label: game.i18n.localize('SPACE-TRADER.TRAVEL-CODES.Amber') },
+          { value: "2", label: game.i18n.localize('SPACE-TRADER.TRAVEL-CODES.Red') }
+        ],
+        passengers: this.passengers,
+        passengerList: this.passengerList,
+        maxHigh: ((config.travStewardSkill > 0) ? (config.travStewardSkill * 10) : 0),
+        maxMid: ((config.travStewardSkill > 0) ? (config.travStewardSkill * 100) :
+          ((config.travStewardSkill == 0) ? 10 : 0)),
+        freight: this.freight,
+        freightList: this.freightList
+      };
+      
+      return context;
+    } catch (error) {
+      console.error("SpaceTrader: FATAL ERROR in _prepareContext:", error);
+      throw error;
+    }
   }
 
-  async getData() {
-    if (this.actor.getFlag(SpaceTrader.ID, SpaceTrader.FLAGS.CONFIG) === undefined) {
-      await this.actor.setFlag(SpaceTrader.ID, SpaceTrader.FLAGS.CONFIG, TradeConfig.getNew());
-    }
-
-    const config = this.actor.getFlag(SpaceTrader.ID, SpaceTrader.FLAGS.CONFIG);
-
-    return {
-      tradeCodes: TRADECODES,
-      config: config,
-      pcs: SpaceTrader.getActors(),
-      passengers: this.passengers,
-      passengerList: this.passengerList,
-      maxHigh: ((config.travStewardSkill > 0) ? (config.travStewardSkill * 10) : 0),
-      maxMid: ((config.travStewardSkill > 0) ? (config.travStewardSkill * 100) :
-        ((config.travStewardSkill == 0) ? 10 : 0)),
-      freight: this.freight,
-      freightList: this.freightList
-    }
-  }
-
-  async _updateObject(event, formData) {
+  async _onSubmit(formData) {
     const data = foundry.utils.expandObject(formData);
-
     await this.actor.setFlag(SpaceTrader.ID, SpaceTrader.FLAGS.CONFIG, data.config);
-    this.freight.brokerRollEffect = data.freight.brokerRollEffect;
-    this.passengers.brokerRollEffect = data.passengers.brokerRollEffect;
+    this.freight.brokerRollEffect = data.freight?.brokerRollEffect;
+    this.passengers.brokerRollEffect = data.passengers?.brokerRollEffect;
   }
 
-  activateListeners(html) {
-    super.activateListeners(html);
-    html.on('click', ".space-trader-search-button", this._handleSearchClick.bind(this));
-    html.on('click', ".passenger-button", this._handlePassengerClick.bind(this));
-    html.on('change', ".toggle-all-passengers", this._handleAllPassengersToggle.bind(this));
-    html.on('change', ".toggle-single-passenger", this._handlePassengerToggle.bind(this));
-    html.on('click', ".onboard-button", this._handleOnBoardClick.bind(this));
-    html.on('click', ".freight-button", this._handleFreightClick.bind(this));
-    html.on('change', ".toggle-all-freight", this._handleAllFreightToggle.bind(this));
-    html.on('change', ".toggle-single-freight", this._handleFreightToggle.bind(this));
-    html.on('click', ".load-button", this._handleLoadCargoClick.bind(this));
-    html.on('click', ".deliver-button", this._handleDeliverFreightClick.bind(this));
+  _configureRenderOptions(options) {
+    super._configureRenderOptions(options);
   }
 
-  async _handleSearchClick(event) {
-    new MapLookup(this, this.actor.getFlag(SpaceTrader.ID, SpaceTrader.FLAGS.CONFIG)).render(true);
+  _onRender(context, options) {
+    // Initialize tabs after render
+    super._onRender(context, options);
+    
+    // Initialize tabs after all parts are rendered
+    this._initializeTabs();
+  }
+
+  _initializeTabs() {
+    const tabNavs = this.element.querySelectorAll('.sheet-tabs a[data-tab]');
+    const tabContents = this.element.querySelectorAll('section.tab[data-tab]');
+    
+    if (tabNavs.length === 0 || tabContents.length === 0) {
+      // Retry after a short delay if tabs aren't ready yet
+      setTimeout(() => this._initializeTabs(), 100);
+      return;
+    }
+    
+    tabNavs.forEach(nav => {
+      nav.addEventListener('click', (event) => {
+        event.preventDefault();
+        const targetTab = nav.dataset.tab;
+        
+        // Remove active from all tabs and contents
+        tabNavs.forEach(n => n.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        
+        // Add active to clicked tab and corresponding content
+        nav.classList.add('active');
+        const targetContent = this.element.querySelector(`section.tab[data-tab="${targetTab}"]`);
+        if (targetContent) {
+          targetContent.classList.add('active');
+        }
+      });
+    });
+    
+    // Ensure the first tab is active by default
+    if (tabNavs.length > 0 && tabContents.length > 0) {
+      tabNavs[0].classList.add('active');
+      tabContents[0].classList.add('active');
+    }
+  }
+
+  _attachPartListeners(partId, htmlElement, options) {
+    super._attachPartListeners?.(partId, htmlElement, options);
+    
+    // Handle form field changes manually since ApplicationV2 submitOnChange isn't working
+    if (partId === "settings") {
+      const formFields = htmlElement.querySelectorAll('input, select');
+      formFields.forEach(field => {
+        field.addEventListener('change', async (event) => {
+          // In ApplicationV2, the form element is the root element
+          const form = this.element;
+          if (form && form.tagName === 'FORM') {
+            const formData = new foundry.applications.ux.FormDataExtended(form);
+            await this._onSubmit(formData.object);
+          }
+        });
+      });
+    }
+  }
+
+  // Static private action handlers - following ApplicationV2 guide
+  static #onSearchClick(event, target) {
+    try {
+      this._handleSearchClick(event);
+    } catch (error) {
+      console.error("SpaceTrader: Critical error in #onSearchClick:", error);
+      ui.notifications.error(`Search action failed: ${error.message}`);
+    }
+  }
+
+  static #onPassengerClick(event, target) {
+    try {
+      this._handlePassengerClick(event);
+    } catch (error) {
+      console.error("SpaceTrader: Critical error in #onPassengerClick:", error);
+      ui.notifications.error(`Passenger action failed: ${error.message}`);
+    }
+  }
+
+  static #onBoardClick(event, target) {
+    try {
+      this._handleOnBoardClick(event);
+    } catch (error) {
+      console.error("SpaceTrader: Critical error in #onBoardClick:", error);
+      ui.notifications.error(`Board action failed: ${error.message}`);
+    }
+  }
+
+  static #onFreightClick(event, target) {
+    try {
+      this._handleFreightClick(event);
+    } catch (error) {
+      console.error("SpaceTrader: Critical error in #onFreightClick:", error);
+      ui.notifications.error(`Freight action failed: ${error.message}`);
+    }
+  }
+
+  static #onLoadCargoClick(event, target) {
+    try {
+      this._handleLoadCargoClick(event);
+    } catch (error) {
+      console.error("SpaceTrader: Critical error in #onLoadCargoClick:", error);
+      ui.notifications.error(`Load cargo action failed: ${error.message}`);
+    }
+  }
+
+  static #onDeliverFreightClick(event, target) {
+    try {
+      this._handleDeliverFreightClick(event);
+    } catch (error) {
+      console.error("SpaceTrader: Critical error in #onDeliverFreightClick:", error);
+      ui.notifications.error(`Deliver freight action failed: ${error.message}`);
+    }
+  }
+
+  static #onAllPassengersToggle(event, target) {
+    try {
+      this._handleAllPassengersToggle(event);
+    } catch (error) {
+      console.error("SpaceTrader: Critical error in #onAllPassengersToggle:", error);
+      ui.notifications.error(`All passengers toggle failed: ${error.message}`);
+    }
+  }
+
+  static #onPassengerToggle(event, target) {
+    try {
+      this._handlePassengerToggle(event);
+    } catch (error) {
+      console.error("SpaceTrader: Critical error in #onPassengerToggle:", error);
+      ui.notifications.error(`Passenger toggle failed: ${error.message}`);
+    }
+  }
+
+  static #onAllFreightToggle(event, target) {
+    try {
+      this._handleAllFreightToggle(event);
+    } catch (error) {
+      console.error("SpaceTrader: Critical error in #onAllFreightToggle:", error);
+      ui.notifications.error(`All freight toggle failed: ${error.message}`);
+    }
+  }
+
+  static #onFreightToggle(event, target) {
+    try {
+      this._handleFreightToggle(event);
+    } catch (error) {
+      console.error("SpaceTrader: Critical error in #onFreightToggle:", error);
+      ui.notifications.error(`Freight toggle failed: ${error.message}`);
+    }
+  }
+
+  _handleSearchClick(event) {
+    try {
+      const config = this.actor.getFlag(SpaceTrader.ID, SpaceTrader.FLAGS.CONFIG);
+      const mapLookup = new MapLookup(this, config);
+      mapLookup.render(true);
+    } catch (error) {
+      console.error("SpaceTrader: Error in _handleSearchClick", error);
+      ui.notifications.error(`Search dialog error: ${error.message}`);
+    }
   }
 
 
@@ -280,10 +506,10 @@ export class SpaceTrader extends FormApplication {
         highPsgrs: highPsgrs
       }
 
-      const cardContent = await renderTemplate(SpaceTrader.TEMPLATES.PASSENGERRESULTS, summaryData);
+      const cardContent = await foundry.applications.handlebars.renderTemplate(SpaceTrader.TEMPLATES.PASSENGERRESULTS, summaryData);
 
       const resultOptions = {
-        type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+        type: CONST.CHAT_MESSAGE_STYLES.OTHER,
         content: cardContent,
         speaker: ChatMessage.getSpeaker({ actor: this.actor })
       }
@@ -296,7 +522,7 @@ export class SpaceTrader extends FormApplication {
 
 
       async function displayChatCard(dmsTotal, rollType, actor) {
-        const roll = await new Roll(formatRollFormula("2d6", dmsTotal)).evaluate({ async: true });
+        const roll = await new Roll(formatRollFormula("2d6", dmsTotal)).evaluate();
         const rollHtml = await roll.render();
         const val = getPassengerDice(roll.total);
 
@@ -310,7 +536,7 @@ export class SpaceTrader extends FormApplication {
 
         if (val[0].diceRoll != "0") {
           toRoll = `${game.i18n.localize('SPACE-TRADER.RollingFor')} ${val[0].diceDesc} ${game.i18n.localize('SPACE-TRADER.Passengers')}`
-          passengerRoll = await new Roll(val[0].diceRoll).evaluate({ async: true })
+          passengerRoll = await new Roll(val[0].diceRoll).evaluate()
           passengerHtml = await passengerRoll.render();
           if (show3dRolls) { game.dice3d?.showForRoll(passengerRoll); }
           passengerResult = `${passengerRoll.total} ${game.i18n.localize('SPACE-TRADER.Passengers')} ${game.i18n.localize('SPACE-TRADER.Found')}`
@@ -331,10 +557,10 @@ export class SpaceTrader extends FormApplication {
             passengerResult: passengerResult
           }
 
-          let cardContent = await renderTemplate(SpaceTrader.TEMPLATES.PASSENGERROLL, rollData);
+          let cardContent = await foundry.applications.handlebars.renderTemplate(SpaceTrader.TEMPLATES.PASSENGERROLL, rollData);
 
           const chatOptions = {
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            type: CONST.CHAT_MESSAGE_STYLES.OTHER,
             content: cardContent,
             speaker: ChatMessage.getSpeaker({ actor: actor })
           }
@@ -388,10 +614,10 @@ export class SpaceTrader extends FormApplication {
       dest: (config.destinationName == "") ? "" : ` (${config.destinationName})`
     }
 
-    let cardContent = await renderTemplate(SpaceTrader.TEMPLATES.PASSENGERONBOARD, rollData);
+    let cardContent = await foundry.applications.handlebars.renderTemplate(SpaceTrader.TEMPLATES.PASSENGERONBOARD, rollData);
 
     const resultOptions = {
-      type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+      type: CONST.CHAT_MESSAGE_STYLES.OTHER,
       content: cardContent,
       speaker: ChatMessage.getSpeaker({ actor: this.actor })
     }
@@ -519,17 +745,17 @@ export class SpaceTrader extends FormApplication {
         this.freightList = [];
 
         for (let i = 0; i < majorLots; i++) {
-          const amount = await new Roll("1d6*10").evaluate({ async: true });
+          const amount = await new Roll("1d6*10").evaluate();
           this.freightList.push({ type: game.i18n.localize('SPACE-TRADER.FreightLot'), tons: amount.total, price: prices.freight * amount.total, checked: false, sort: amount.total });
         }
 
         for (let i = 0; i < minorLots; i++) {
-          const amount = await new Roll("1d6*5").evaluate({ async: true });
+          const amount = await new Roll("1d6*5").evaluate();
           this.freightList.push({ type: game.i18n.localize('SPACE-TRADER.FreightLot'), tons: amount.total, price: prices.freight * amount.total, checked: false, sort: amount.total });
         }
 
         for (let i = 0; i < incidentalLots; i++) {
-          const amount = await new Roll("1d6").evaluate({ async: true });
+          const amount = await new Roll("1d6").evaluate();
           this.freightList.push({ type: game.i18n.localize('SPACE-TRADER.FreightLot'), quantity: 1, tons: amount.total, price: prices.freight * amount.total, checked: false, sort: amount.total });
         }
 
@@ -551,10 +777,10 @@ export class SpaceTrader extends FormApplication {
         mailLots: (mailLots > 0) ? 1 : 0
       }
 
-      const cardContent = await renderTemplate(SpaceTrader.TEMPLATES.FREIGHTRESULTS, summaryData);
+      const cardContent = await foundry.applications.handlebars.renderTemplate(SpaceTrader.TEMPLATES.FREIGHTRESULTS, summaryData);
 
       const resultOptions = {
-        type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+        type: CONST.CHAT_MESSAGE_STYLES.OTHER,
         content: cardContent,
         speaker: ChatMessage.getSpeaker({ actor: this.actor })
       }
@@ -566,7 +792,7 @@ export class SpaceTrader extends FormApplication {
       ChatMessage.create(resultOptions);
 
       async function displayChatCard(dmsTotal, rollType, actor) {
-        const roll = await new Roll(formatRollFormula("2d6", dmsTotal)).evaluate({ async: true });
+        const roll = await new Roll(formatRollFormula("2d6", dmsTotal)).evaluate();
         const rollHtml = await roll.render();
         const val = getFreightDice(roll.total);
 
@@ -580,7 +806,7 @@ export class SpaceTrader extends FormApplication {
 
         if (val[0].diceRoll != "0") {
           toRoll = `${game.i18n.localize('SPACE-TRADER.RollingFor')} ${val[0].diceDesc} ${game.i18n.localize('SPACE-TRADER.Lots')}`
-          freightRoll = await new Roll(val[0].diceRoll).evaluate({ async: true })
+          freightRoll = await new Roll(val[0].diceRoll).evaluate()
           freightHtml = await freightRoll.render();
           if (show3dRolls) { game.dice3d?.showForRoll(freightRoll); }
           freightResult = `${freightRoll.total} ${game.i18n.localize('SPACE-TRADER.Lots')} ${game.i18n.localize('SPACE-TRADER.Found')}`
@@ -601,10 +827,10 @@ export class SpaceTrader extends FormApplication {
             freightResult: freightResult
           }
 
-          let cardContent = await renderTemplate(SpaceTrader.TEMPLATES.FREIGHTROLL, rollData);
+          let cardContent = await foundry.applications.handlebars.renderTemplate(SpaceTrader.TEMPLATES.FREIGHTROLL, rollData);
 
           const chatOptions = {
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            type: CONST.CHAT_MESSAGE_STYLES.OTHER,
             content: cardContent,
             speaker: ChatMessage.getSpeaker({ actor: actor })
           }
@@ -623,7 +849,7 @@ export class SpaceTrader extends FormApplication {
 
 
       async function displayMailChatCard(dmsTotal, rollType, actor) {
-        const roll = await new Roll(formatRollFormula("2d6", dmsTotal)).evaluate({ async: true });
+        const roll = await new Roll(formatRollFormula("2d6", dmsTotal)).evaluate();
         const rollHtml = await roll.render();
 
         if (show3dRolls) { game.dice3d?.showForRoll(roll); }
@@ -636,7 +862,7 @@ export class SpaceTrader extends FormApplication {
 
         if (roll.total >= 12) {
           toRoll = `${game.i18n.localize('SPACE-TRADER.RollingFor')} 1D ${game.i18n.localize('SPACE-TRADER.Containers')}`
-          freightRoll = await new Roll("1d6").evaluate({ async: true })
+          freightRoll = await new Roll("1d6").evaluate()
           freightHtml = await freightRoll.render();
           if (show3dRolls) { game.dice3d?.showForRoll(freightRoll); }
           freightResult = `${freightRoll.total} ${game.i18n.localize('SPACE-TRADER.Containers')} ${game.i18n.localize('SPACE-TRADER.Found')}`
@@ -657,10 +883,10 @@ export class SpaceTrader extends FormApplication {
             freightResult: freightResult
           }
 
-          let cardContent = await renderTemplate(SpaceTrader.TEMPLATES.FREIGHTROLL, rollData);
+          let cardContent = await foundry.applications.handlebars.renderTemplate(SpaceTrader.TEMPLATES.FREIGHTROLL, rollData);
 
           const chatOptions = {
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            type: CONST.CHAT_MESSAGE_STYLES.OTHER,
             content: cardContent,
             speaker: ChatMessage.getSpeaker({ actor: actor })
           }
@@ -712,10 +938,10 @@ export class SpaceTrader extends FormApplication {
       dest: (config.destinationName == "") ? "" : ` (${config.destinationName})`
     }
 
-    let cardContent = await renderTemplate(SpaceTrader.TEMPLATES.FREIGHTLOAD, rollData);
+    let cardContent = await foundry.applications.handlebars.renderTemplate(SpaceTrader.TEMPLATES.FREIGHTLOAD, rollData);
 
     const resultOptions = {
-      type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+      type: CONST.CHAT_MESSAGE_STYLES.OTHER,
       content: cardContent,
       speaker: ChatMessage.getSpeaker({ actor: this.actor })
     }

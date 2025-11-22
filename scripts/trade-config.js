@@ -27,7 +27,7 @@ export class TradeConfig {
 
     static getNew() {
         const newConfig = { 
-            uwp: "",
+            uwp: "B867432-9",  // Valid example UWP (Rhylanor from Classic Traveller)
             tradeCodes : {
                 Ag: false,
                 As: false,

@@ -1,4 +1,5 @@
-<div class="space-trader-freight-page">
+<section class="tab" data-tab="freight" data-group="sheet">
+<div class="space-trader-freight-content">
 
     <div class="space-trader-lower-text" title="{{localize 'SPACE-TRADER.FreightEffect'}}">
         <label>{{localize "SPACE-TRADER.FreightEffect"}}: </label>
@@ -7,8 +8,9 @@
     </div>
     <div>&nbsp;</div>
     <div>
-        <button class="freight-button space-trader-get-button" title="{{localize 'SPACE-TRADER.GetFreightAndMail'}}">
-            {{localize 'SPACE-TRADER.GetFreightAndMail'}}</button>
+        <button data-action="freight" class="space-trader-get-button" title="{{localize 'SPACE-TRADER.GetFreightAndMail'}}">
+            {{localize 'SPACE-TRADER.GetFreightAndMail'}}
+        </button>
     </div>
 
     <div class="space-trader-freight-list">
@@ -26,7 +28,7 @@
 
             {{#each freightList}}
             <div><input type="checkbox" name="freightList.{{@this.key}}" {{checked this.checked}}
-                    data-id="{{@this.key}}" class="toggle-single-freight" /></div>
+                    data-id="{{@this.key}}" data-action="toggleFreight" /></div>
             <div class="space-trader-lower-text">{{this.type}}</div>
             <div class="space-trader-lower-text">{{this.tons}}</div>
             <div class="space-trader-lower-text">{{this.price}}</div>
@@ -35,19 +37,22 @@
         </div>
     </div>
     <div class="space-trader-lower-text">
-        <input type="checkbox" name="toggleAll" class="toggle-all-freight" title="{{localize 'SPACE-TRADER.ToggleAll'}}"
+        <input type="checkbox" name="toggleAll" data-action="toggleAllFreight" title="{{localize 'SPACE-TRADER.ToggleAll'}}"
             data-dtype="Boolean" {{checked freight.allChecked}} {{disabled freight.none}} />
         <label>{{localize 'SPACE-TRADER.ToggleAll'}}</label>
     </div>
     <div>
-        <button class="deliver-button space-trader-get-button" title="{{localize 'SPACE-TRADER.OffloadFreightTooltip'}}"
+        <button data-action="deliver" class="space-trader-get-button" title="{{localize 'SPACE-TRADER.OffloadFreightTooltip'}}"
             {{disabled freight.noCargo}}>
-            {{localize 'SPACE-TRADER.DeliverFreight'}}</button>
+            {{localize 'SPACE-TRADER.DeliverFreight'}}
+        </button>
     </div>
     <div>
-        <button class="load-button space-trader-get-button" title="{{localize 'SPACE-TRADER.LoadFreightTooltip'}}"
+        <button data-action="load" class="space-trader-get-button" title="{{localize 'SPACE-TRADER.LoadFreightTooltip'}}"
             {{disabled freight.noneSelected}}>
-            {{localize 'SPACE-TRADER.LoadFreight'}}</button>
+            {{localize 'SPACE-TRADER.LoadFreight'}}
+        </button>
     </div>
 
 </div>
+</section>

@@ -1,9 +1,36 @@
-export class MapLookup extends FormApplication {
-    static ID = 'space-trader';
-    static TEMPLATE = `modules/${this.ID}/templates/map-lookup.hbs`;
+export class MapLookup extends foundry.applications.api.HandlebarsApplicationMixin(foundry.applications.api.ApplicationV2) {
+    static ID = 'world-lookup';
+    static TEMPLATE = `modules/space-trader/templates/map-lookup.hbs`;
     static APIBASE = 'https://travellermap.com/api';
     static SEARCHAPI = 'search';
     static UWPAPI = 'credits';
+
+    static DEFAULT_OPTIONS = {
+        id: "world-lookup",
+        tag: "form",
+        window: {
+            title: "SPACE-TRADER.WorldLookup",
+            resizable: true
+        },
+        position: {
+            width: 300,
+            height: "auto"
+        },
+        form: {
+            submitOnChange: true,
+            closeOnSubmit: false
+        },
+        actions: {
+            search: this.#onSearchClick,
+            select: this.#onSelectClick
+        }
+    };
+
+    static PARTS = {
+        form: {
+            template: "modules/space-trader/templates/map-lookup.hbs"
+        }
+    };
 
     static async fetchSearchResults(query) {
         const url = `${MapLookup.APIBASE}/${MapLookup.SEARCHAPI}?q=${query}`;
@@ -35,27 +62,9 @@ export class MapLookup extends FormApplication {
         let resp = await fetch(url);
         let world = await resp.json();
         return world;
-
     }
 
-    static get defaultOptions() {
-        const defaults = super.defaultOptions;
-
-        const overrides = {
-            height: 'auto',
-            width: 300,
-            id: 'world-lookup',
-            template: this.TEMPLATE,
-            closeOnSubmit: false,
-            title: game.i18n.localize('SPACE-TRADER.WorldLookup')
-        };
-        const mergedOptions = foundry.utils.mergeObject(defaults, overrides);
-
-        return mergedOptions;
-    }
-
-
-    constructor(traderApp, config, options) {
+    constructor(traderApp, config, options = {}) {
         super(options);
         this.query = '';
         this.worlds = [];
@@ -64,7 +73,7 @@ export class MapLookup extends FormApplication {
         this.config = config;
     }
 
-    async getData() {
+    async _prepareContext(options) {
         return {
             worlds: this.worlds,
             query: this.query,
@@ -72,46 +81,46 @@ export class MapLookup extends FormApplication {
         }
     }
 
-
-    async _updateObject(event, formData) {
+    async _onSubmit(formData) {
         const data = foundry.utils.expandObject(formData);
         this.query = data.query;
     }
 
-    activateListeners(html) {
-        super.activateListeners(html);
+    _attachPartListeners(partId, htmlElement, options) {
+        // Set up change listener for world select dropdown (non-action events)
+        const worldSelect = htmlElement.querySelector('.world-select');
+        if (worldSelect) {
+            worldSelect.addEventListener('change', (event) => {
+                this.selectedWorld = event.target.value;
+                const selectButton = htmlElement.querySelector('[data-action="select"]');
+                if (selectButton) selectButton.disabled = false;
+            });
 
-        html.on('click', ".search-button", this._handleSearchClick.bind(this));
-        html.on('change', ".world-select", this._handleWorldSelect.bind(this));
-        html.on('dblclick', ".world-select", this._handleWorldDoubleClick.bind(this));
-        html.on('click', ".select-button", this._handleSelectClick.bind(this));
+            worldSelect.addEventListener('dblclick', async (event) => {
+                const world = await MapLookup.fetchWorldData(this.selectedWorld);
+                this.updateTraderWindow(world);
+            });
+        }
+    }
+
+    // Static private action handlers
+    static #onSearchClick(event, target) {
+        this._handleSearchClick(event);
+    }
+
+    static #onSelectClick(event, target) {
+        this._handleSelectClick(event);
     }
 
     async _handleSearchClick(event) {
-        // why are all these not working?
-        // console.warn(event);
-        // const element = event.target;
-        // console.warn(element);
-        // const q = event.target.closest(".query");
-        // console.warn(q);
-        //
         this.selectedWorld = "";
-        if (event.currentTarget.previousElementSibling.value) {
-            this.worlds = await MapLookup.fetchSearchResults(event.currentTarget.previousElementSibling.value ?? "");
+        const queryInput = this.element.querySelector('input[name="query"]');
+        if (queryInput && queryInput.value) {
+            this.worlds = await MapLookup.fetchSearchResults(queryInput.value);
             if (this.worlds) { this.render(true); }
         } else {
             ui.notifications.warn(game.i18n.localize('SPACE-TRADER.ERRORS.MissingQuery'));
         }
-    }
-
-    async _handleWorldSelect(event) {
-        this.selectedWorld = event.target.value;
-        event.delegateTarget[3].disabled = false;
-    }
-
-    async _handleWorldDoubleClick(event) {
-        const world = await MapLookup.fetchWorldData(this.selectedWorld);
-        this.updateTraderWindow(world);
     }
 
     async _handleSelectClick(event) {
