@@ -1,0 +1,32 @@
+<div class="st-chatcard">
+    <span style="font-weight: bold">{{rollType}}</span>
+    <br />
+
+    {{#each detailRolls}}
+        {{localize (concat 'SPACE-TRADER.TRADEGOODNAMES.' this.item.typeName)}}
+
+        <table>
+            <tr>
+                <td>{{localize 'SPACE-TRADER.SPECTRADEDMS.Buy'}}</td>
+                <td>{{{this.dms.buyDm.name}}}</td>
+                <td>-{{{this.dms.buyDm.dm}}}</td>
+            </tr>
+            <tr>
+                <td>{{localize 'SPACE-TRADER.SPECTRADEDMS.Sell'}}</td>
+                <td>{{{this.dms.sellDm.name}}}</td>
+                <td>{{{this.dms.sellDm.dm}}}</td>
+            </tr>
+            <tr>
+                <td>{{localize 'SPACE-TRADER.SPECTRADEDMS.Supplier'}}</td>
+                <td></td>
+                <td>-{{{this.dms.supplierBroker}}}</td>
+            </tr>
+        </table>
+
+        {{{this.rollHtml}}}
+        {{this.priceMod}} x  {{{this.item.base}}} = {{{this.item.sell}}}
+        <br /><br />
+    {{/each}}
+
+</div>
+

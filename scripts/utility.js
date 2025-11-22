@@ -343,7 +343,6 @@ function getHighestSpecBuyDM(tradeCodes, dms) {
     return { name: dmName, dm: maxDM };
 }
 
-
 export function getPurchaseMod(roll) {
     if (roll > 25) { roll = 25 };
     if (roll < -3) { roll = -3 };

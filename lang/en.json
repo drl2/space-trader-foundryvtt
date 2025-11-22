@@ -230,7 +230,8 @@
             "CommonTradeGoods": "Common Trade Goods",
             "TradeCodeGoods": "Goods by Trade Code",
             "TradeGoodsTonnage": "Trade Goods Tonnage",
-            "TradeGoodsPurchasePrice": "Trade Goods Purchase Price"
+            "TradeGoodsPurchasePrice": "Trade Goods Purchase Price",
+            "TradeGoodsOfferPrice": "Trade Goods Offer Price"
         },
         "PASSENGERTYPES": {
             "HighPsgr": "High Passengers",

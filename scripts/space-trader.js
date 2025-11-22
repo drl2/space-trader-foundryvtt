@@ -15,7 +15,8 @@ import { FreightSale } from './freight-sale.js';
 
 Hooks.once('init', async function () {
   registerSettings(SpaceTrader.ID);
-  await loadTemplates({
+  
+  await foundry.applications.handlebars.loadTemplates({
     settings: "/modules/space-trader/templates/parts/settings.hbs",
     passengers: "/modules/space-trader/templates/parts/passengers.hbs",
     freight: "/modules/space-trader/templates/parts/freight.hbs",
@@ -28,46 +29,58 @@ Hooks.once('devModeReady', ({ registerPackageDebugFlag }) => {
   registerPackageDebugFlag(SpaceTrader.ID);
 });
 
-Hooks.on("renderTokenHUD", async (hud, html, token) => {
+Hooks.on("renderTokenHUD", async (hud, html,   token) => {
+  if (!canvas.tokens.controlled) {
+    return;
+  }
+
   const actor = game.actors.get(token.actorId);
+
   const shipOwnersCanUse = game.settings.get(SpaceTrader.ID, 'shipOwnersCanUse');
 
   if (isShipOwner(actor, shipOwnersCanUse)) {
     const button = $(`
-      <div class="control-icon">
-        <img src="icons/svg/coins.svg" width="36" height="36" title="${game.i18n.localize('SPACE-TRADER.TradingMenu')}"/>
-      </div>
+      <button type="button" class="control-icon" data-tooltip="${game.i18n.localize('SPACE-TRADER.TradingMenu')}">
+        <img src="icons/svg/coins.svg" />
+      </button>
     `)
 
-    button.on('click', () => {
+    let right = html.querySelector('div.right');
+    right?.insertAdjacentHTML('beforeend', button[0].outerHTML)
+    right?.addEventListener('click', () => {
       showTradeWindow(actor);
-    })
-
-    html.find('div.right').append(button);
-  }
+    }
+  )
+  
+    }
 })
 
-Hooks.on("getActorDirectoryEntryContext", async (html, menuItems) => {
+
+Hooks.on("getActorContextOptions", async (html, menuItems) => {
+  console.warn(html);
   const shipOwnersCanUse = game.settings.get(SpaceTrader.ID, 'shipOwnersCanUse');
+  const actorId = html[0].dataset.documentId;
+
   menuItems.push({
     name: "SPACE-TRADER.TradingMenu",
     icon: `<i class="fa fa-coins"></i>`,
     callback: async (html) => {
-      const actorId = html[0].dataset.documentId;
       const actor = game.actors.get(actorId);
       showTradeWindow(actor);
     },
     condition: (html) => {
-      const actorId = html[0].dataset.documentId;
       const actor = game.actors.get(actorId);
       return isShipOwner(actor, shipOwnersCanUse);
     }
-  })
+  });
 })
 
 Hooks.on("renderActorSheet", async (app, html) => {
+  console.warn("actorsheet");
   const shipOwnersCanUse = game.settings.get(SpaceTrader.ID, 'shipOwnersCanUse');
   const actor = app.actor;
+  console.warn(shipOwnersCanUse);
+  console.warn(actor);
   if (isShipOwner(actor, shipOwnersCanUse)) {
     const button = $(`<button class="space-trader-cargo-button"><i class="fa fa-coins"></i> ${game.i18n.localize('SPACE-TRADER.TradingMenu')}</button>`);
 
@@ -75,12 +88,17 @@ Hooks.on("renderActorSheet", async (app, html) => {
       showTradeWindow(actor);
     })
 
-    const loc = html.find(".cargo-weight");
+    const loc = html.querySelectorAll(".cargo-weight");
+    console.warn(loc);
     loc.append(button);
   }
 })
 
 Hooks.on("renderTwodsixItemSheet", async (app, html, data) => {
+  if (!canvas.tokens.controlled) {
+    return;
+  }
+  
   if (data.type === "component" && data.system.subtype === "cargo") {
     const current_ll = data.flags["space-trader"]?.lawLevel ?? 0
 
@@ -112,7 +130,8 @@ export class SpaceTrader extends FormApplication {
     SPECBUYROLL: `modules/${this.ID}/templates/chatcards/specbuyrollresults.hbs`,
     SPECBUYDEFAULTS: `modules/${this.ID}/templates/chatcards/specbuydefaults.hbs`,
     SPECBUYQTYRESULTS: `modules/${this.ID}/templates/chatcards/specbuyqtyresults.hbs`,
-    SPECBUYSELLPRICE: `modules/${this.ID}/templates/chatcards/specbuysellprice.hbs`,
+    SPECBUYPRICE: `modules/${this.ID}/templates/chatcards/specbuyprice.hbs`,
+    SPECSELLPRICE: `modules/${this.ID}/templates/chatcards/specsellprice.hbs`,
     SPECBUYSUMMARY: `modules/${this.ID}/templates/chatcards/specbuysummary.hbs`,
     SPECBUYPURCHASE: `modules/${this.ID}/templates/chatcards/specbuypurchase.hbs`,
   }
@@ -1019,7 +1038,7 @@ export class SpaceTrader extends FormApplication {
           detailRolls: detailRolls
         }
 
-        const cardContent = await renderTemplate(SpaceTrader.TEMPLATES.SPECBUYSELLPRICE, rollData);
+        const cardContent = await renderTemplate(SpaceTrader.TEMPLATES.SPECBUYPRICE, rollData);
 
         const resultOptions = {
           type: CONST.CHAT_MESSAGE_STYLES.OTHER,
@@ -1143,7 +1162,7 @@ export class SpaceTrader extends FormApplication {
   }
 
 
-  // TODO: build this
+
   async _handleGetSpecSellClick(event) {
     const config = this.actor.getFlag(SpaceTrader.ID, SpaceTrader.FLAGS.CONFIG);
     const worldStats = TradeConfig.parseUWP(config.uwp);
@@ -1152,10 +1171,74 @@ export class SpaceTrader extends FormApplication {
       const showPlayers = game.settings.get(SpaceTrader.ID, 'showPlayers');
       const shipOwnersCanUse = game.settings.get(SpaceTrader.ID, 'shipOwnersCanUse');
       const show3dRolls = game.settings.get(SpaceTrader.ID, 'show3dDice');
-    }
 
-    // sell price calculations
-    
+      const detailRolls = [];
+      this.specSellOffer = [];
+
+      // sell price calculations
+      if (this.specSellList.length > 0) {
+        for (const goodType of this.specSellList) {
+          const dms = getTradeGoodDMs(goodType.typeName, config);
+
+          if (dms.sellDm < goodType.llDiff) dms.sellDm = goodType.llDiff;
+          const dice = `3d6-${dms.buyDm.dm}+${dms.sellDm.dm}-${dms.supplierBroker}`;
+          const priceRoll = await new Roll(dice).evaluate();
+          const priceHtml = await priceRoll.render();
+
+          if (show3dRolls) { game.dice3d?.showForRoll(priceRoll); }
+
+          const priceMod = getSaleMod(priceRoll.total);
+
+          this.specSellOffer.push(
+            {
+              id: goodType.id,
+              offer: Math.round(goodType.base * priceMod),
+              relativeValue: (goodType.purchasePrice < goodType.base) ? 1 : (goodType.purchasePrice > goodType.base) ? -1 : 0
+            }
+          );
+
+          if (showGM === "showDetails") {
+            detailRolls.push(
+              {
+                item: goodType,
+                dms: dms,
+                rollHtml: priceHtml,
+                priceMod: priceMod
+              }
+            )
+          }
+        }
+
+        if (showGM === "showDetails") {
+          await displayTradeGoodsOfferPrice(detailRolls, game.i18n.localize('SPACE-TRADER.ROLLINGFOR.TradeGoodsOfferPrice'), this.actor);
+        }
+      }
+
+console.warn(this.specSellOffer);
+
+
+
+      async function displayTradeGoodsOfferPrice(detailRolls, rollType, actor) {
+        const rollData = {
+          rollType: rollType,
+          detailRolls: detailRolls
+        }
+
+        const cardContent = await renderTemplate(SpaceTrader.TEMPLATES.SPECSELLPRICE, rollData);
+
+        const resultOptions = {
+          type: CONST.CHAT_MESSAGE_STYLES.OTHER,
+          content: cardContent,
+          speaker: ChatMessage.getSpeaker({ actor: actor })
+        }
+
+        if (!showPlayers) {
+          resultOptions.whisper = getWhisperTargets(actor, shipOwnersCanUse);;
+        }
+
+        ChatMessage.create(resultOptions);
+      }
+    }
   }
 
   async _handleSpecBuyIsLegal(event) {
@@ -1170,6 +1253,7 @@ export class SpaceTrader extends FormApplication {
 
   refreshSpecSell(actor) {
     const config = this.actor.getFlag(SpaceTrader.ID, SpaceTrader.FLAGS.CONFIG);
+    if (!config.uwp) { return; }
     const worldStats = TradeConfig.parseUWP(config.uwp);
     const specCargoList = getSpecCargo(actor, this.specSell.isLegal, worldStats.lawlevel);
     
@@ -1181,7 +1265,7 @@ export class SpaceTrader extends FormApplication {
         // need to check for locally illegal
         ll = cargo.flags[SpaceTrader.ID]?.lawLevel;
         if (!cargo.system.isIllegal && (ll > 0)) {
-          llDiff =  worldStats.lawlevel - ll;
+          llDiff = worldStats.lawlevel - ll;
         }
 
         this.specSellList.push({
@@ -1190,6 +1274,7 @@ export class SpaceTrader extends FormApplication {
           tons: cargo.system.quantity,
           llDiff: llDiff,
           purchasePrice: cargo.system.purchasePrice,
+          base: cargo.system.price,
           typeName: cargo.getFlag(SpaceTrader.ID, SpaceTrader.FLAGS.TYPENAME)
         })
       }
@@ -1242,7 +1327,7 @@ export class SpaceTrader extends FormApplication {
     }
 
     // validate traveller broker skill
-    if (rollType === ROLLTYPES.specBuy || rollType === ROLLTYPES.specsELL) {  
+    if (rollType === ROLLTYPES.specBuy || rollType === ROLLTYPES.specsELL) {
       if (!Number.isInteger(parseInt(config.travBrokerSkill))) {
         ui.notifications.error(game.i18n.localize('SPACE-TRADER.ERRORS.BadBrokerSkill'));
         isOk = false;
